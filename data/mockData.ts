@@ -1,4 +1,4 @@
-import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange } from '../types';
+import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
 const generateSparkline = (length = 12, max = 100) => {
@@ -360,7 +360,6 @@ export const getAtroposModuleMetrics = (subscribers: Subscriber[] = [], zones: Z
     const factor = filterFactor * timeFactor;
     return [
     { id: 'atropos_css', name: 'CSS', value: '4.8/5', status: 'green', description: 'Customer Satisfaction Score (Quarterly). A measure of customer happiness with the message application features.', change: '+0.1' },
-    { id: 'atropos_far', name: 'Feature Adoption', value: '82%', status: 'green', description: 'Percentage of subscribers actively using key features of the Atropos module.', change: '+3%' },
     { id: 'atropos_events', name: 'Events Published', value: `${(25.4 * factor * 30).toFixed(1)}M`, status: 'green', description: 'Total number of events published via the Atropos module.', change: `+${(12.3 * filterFactor).toFixed(1)}%` },
     { id: 'atropos_latency', name: 'p99 Latency', value: `${(950 * (1 / filterFactor)).toFixed(0)}ms`, status: 'amber', description: '99th percentile publish latency for the Atropos module.', change: `+${(8.5 * (1/filterFactor)).toFixed(1)}%` },
 ]};
@@ -430,7 +429,6 @@ export const getAtroposDashboardKpis = (subscribers: Subscriber[] = [], zones: Z
         {...msgKpis[0], id: 'atropos_events_dash', title: 'Atropos Events Published', value: '25.4M'},
         {...msgKpis[1], id: 'atropos_health_dash', title: 'Atropos Health', value: '99.91%', status: 'amber'},
         {...fileKpis[3], id: 'atropos_css_dash', title: 'Customer Satisfaction', value: '4.8/5', change: '+0.1', changeType: 'increase', status: 'green', description: 'Quarterly customer satisfaction score.'},
-        {...fileKpis[3], id: 'atropos_far_dash', title: 'Feature Adoption Rate', value: '82%', change: '+3%', changeType: 'increase', status: 'green', description: 'Percentage of subscribers using key features.'},
     ];
 };
 
@@ -575,21 +573,19 @@ export const getMessageAppTSheetData = (selectedSubscribers: Subscriber[] = [], 
 // --- T-Sheet Data for File Application ---
 
 export const FILE_APP_TSHEET_METRICS: TSheetMetric[] = [
-    { key: 'batchJobsInception', label: 'No of batch jobs from inception', isGroupSeparator: false },
     { key: 'batchJobRuns', label: 'No of batch job runs', isGroupSeparator: false },
-    { key: 'fileAppsInception', label: 'No of file applications from inception', isGroupSeparator: true },
     { key: 'filesProcessed', label: 'No of files processed by file applications', isGroupSeparator: false },
 ];
 
 const T_SHEET_FILE_APP_BASE_DATA: TSheetData = {
-    'Cardworks': { batchJobsInception: '200', batchJobRuns: '15000', fileAppsInception: '50', filesProcessed: '5500' },
-    'Sparrow': { batchJobsInception: '50', batchJobRuns: '2500', fileAppsInception: '0', filesProcessed: '0' },
-    'HDFC': { batchJobsInception: '150', batchJobRuns: '10000', fileAppsInception: '5', filesProcessed: '50' },
-    'Optum': { batchJobsInception: '180', batchJobRuns: '12000', fileAppsInception: '60', filesProcessed: '3000' },
-    'Jenius Bank': { batchJobsInception: '100', batchJobRuns: '5000', fileAppsInception: '10', filesProcessed: '500' },
-    'Lakestack': { batchJobsInception: '80', batchJobRuns: '4000', fileAppsInception: '2', filesProcessed: '100' },
-    'ITP': { batchJobsInception: '120', batchJobRuns: '8000', fileAppsInception: '20', filesProcessed: '1000' },
-    'Tachyon Credit': { batchJobsInception: '70', batchJobRuns: '3000', fileAppsInception: '0', filesProcessed: '0' }
+    'Cardworks': { batchJobRuns: '15000', filesProcessed: '5500' },
+    'Sparrow': { batchJobRuns: '2500', filesProcessed: '0' },
+    'HDFC': { batchJobRuns: '10000', filesProcessed: '50' },
+    'Optum': { batchJobRuns: '12000', filesProcessed: '3000' },
+    'Jenius Bank': { batchJobRuns: '5000', filesProcessed: '500' },
+    'Lakestack': { batchJobRuns: '4000', filesProcessed: '100' },
+    'ITP': { batchJobRuns: '8000', filesProcessed: '1000' },
+    'Tachyon Credit': { batchJobRuns: '3000', filesProcessed: '0' }
 };
 
 export const getFileAppTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; subscribers: string[] } => {
@@ -641,4 +637,46 @@ export const getFeatureAdoptionData = (subscribers: Subscriber[] = [], zones: Zo
         adoption: Math.max(10, Math.min(100, Math.round(feature.adoption * factor))),
         change: (Math.random() - 0.4) * 5 * getTimeRangeFactor(timeRange) * 30, // random change
     })).sort((a,b) => b.adoption - a.adoption);
+};
+
+export const getTriggeredAlerts = (): TriggeredAlert[] => {
+    const now = new Date();
+    return [
+        {
+            id: 'alert_1',
+            title: 'High Error Rate (>5%)',
+            severity: 'red',
+            timestamp: new Date(now.getTime() - 5 * 60 * 1000).toISOString(),
+            isRead: false,
+            subscriberId: 'sparrow',
+            subscriberName: 'Sparrow'
+        },
+        {
+            id: 'alert_2',
+            title: 'High Latency (>1.5s)',
+            severity: 'amber',
+            timestamp: new Date(now.getTime() - 22 * 60 * 1000).toISOString(),
+            isRead: false,
+            subscriberId: 'hdfc',
+            subscriberName: 'HDFC'
+        },
+        {
+            id: 'alert_3',
+            title: 'Uptime Degradation (<99.9%)',
+            severity: 'amber',
+            timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+            isRead: true,
+            subscriberId: 'cardworks',
+            subscriberName: 'Cardworks'
+        },
+        {
+            id: 'alert_4',
+            title: 'Queue Lag > 1000 items',
+            severity: 'red',
+            timestamp: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+            isRead: true,
+            subscriberId: 'tachyon_credit',
+            subscriberName: 'Tachyon Credit'
+        }
+    ];
 };

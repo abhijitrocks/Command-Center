@@ -185,3 +185,13 @@ export interface FeatureAdoption {
     description: string;
     change: number;
 }
+
+export interface TriggeredAlert {
+  id: string;
+  title: string;
+  severity: 'red' | 'amber';
+  timestamp: string; // ISO string
+  isRead: boolean;
+  subscriberId: string;
+  subscriberName: string;
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import { getAdoptionKpis, getSubscribersMetrics, getFeatureAdoptionData } from '../data/mockData';
 import { useDashboard } from '../contexts/DashboardContext';
@@ -10,10 +10,15 @@ import { useView } from '../contexts/ViewContext';
 const AdoptionConsole: React.FC = () => {
   const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
   const { setView } = useView();
+  const [subscriberSearch, setSubscriberSearch] = useState('');
     
   const kpis = getAdoptionKpis(selectedSubscribers, selectedZones, selectedTimeRange);
   const subscriberMetrics = getSubscribersMetrics(selectedSubscribers, selectedZones);
   const featureAdoptionData = getFeatureAdoptionData(selectedSubscribers, selectedZones, selectedTimeRange);
+  
+  const filteredSubscriberMetrics = subscriberMetrics.filter(metric =>
+    metric.subscriberName.toLowerCase().includes(subscriberSearch.toLowerCase())
+  );
 
   const handleTenantClick = (tenantId: string) => {
     setView(View.TENANT_DETAIL, { tenantId: tenantId });
@@ -44,7 +49,16 @@ const AdoptionConsole: React.FC = () => {
         {/* Right Sticky Column */}
         <div className="space-y-6">
             <div className="bg-gray-800 p-4 rounded-lg">
-                <h3 className="text-md font-semibold text-white mb-4">Subscribers Usage</h3>
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-md font-semibold text-white">Subscribers Usage</h3>
+                    <input
+                        type="text"
+                        placeholder="Search subscribers..."
+                        value={subscriberSearch}
+                        onChange={(e) => setSubscriberSearch(e.target.value)}
+                        className="bg-gray-700 border-gray-600 rounded-md text-white px-3 py-1.5 text-sm focus:ring-brand-blue focus:border-brand-blue w-48"
+                    />
+                </div>
                  <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-400 uppercase bg-gray-700/50">
@@ -57,7 +71,7 @@ const AdoptionConsole: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {subscriberMetrics.map(t => (
+                            {filteredSubscriberMetrics.map(t => (
                                 <tr key={t.subscriberId} className="border-b border-gray-700 hover:bg-gray-700/50">
                                     <td className="px-4 py-2 font-medium text-white">
                                         <button onClick={() => handleTenantClick(t.subscriberId)} className="hover:text-brand-blue hover:underline text-left transition-colors">

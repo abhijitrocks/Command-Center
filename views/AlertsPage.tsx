@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowLeftIcon, TrashIcon } from '../components/icons';
 import { useView } from '../contexts/ViewContext';
 import { getAlertableMetrics, getExistingAlerts } from '../data/mockData';
 import { AlertRule, AlertCondition, AlertAction, View, AlertableMetric } from '../types';
+import { useNotification } from '../contexts/NotificationContext';
 
 const initialNewAlertState: Omit<AlertRule, 'id'> = {
     name: '',
@@ -19,6 +21,7 @@ const AlertsPage: React.FC = () => {
     const [alerts, setAlerts] = useState<AlertRule[]>(getExistingAlerts());
     const [newAlert, setNewAlert] = useState<Omit<AlertRule, 'id'>>(initialNewAlertState);
     const alertableMetrics = getAlertableMetrics();
+    const { addNotification } = useNotification();
 
     useEffect(() => {
         if (viewState.initialAlertConfig?.metricId) {
@@ -42,7 +45,7 @@ const AlertsPage: React.FC = () => {
 
     const handleSaveAlert = () => {
         if (!newAlert.name || !newAlert.metricId) {
-            alert("Please fill in Alert Name and select a Metric.");
+            addNotification("Please fill in Alert Name and select a Metric.", "error");
             return;
         }
         const alertToAdd: AlertRule = {
@@ -51,6 +54,7 @@ const AlertsPage: React.FC = () => {
         };
         setAlerts(prev => [alertToAdd, ...prev]);
         setNewAlert(initialNewAlertState);
+        addNotification(`Alert rule "${alertToAdd.name}" created successfully!`, 'success');
     };
 
     const handleDeleteAlert = (id: string) => {

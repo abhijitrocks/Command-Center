@@ -13,7 +13,6 @@ const AtroposDashboard: React.FC<AtroposDashboardProps> = ({ onBack }) => {
     const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
     const kpis = getAtroposDashboardKpis(selectedSubscribers, selectedZones, selectedTimeRange);
     const trendData1 = getTrendData('Atropos Events Published Trend', selectedSubscribers, selectedZones, selectedTimeRange);
-    const trendData2 = getTrendData('Atropos Feature Adoption Trend', selectedSubscribers, selectedZones, selectedTimeRange);
     const logs = getModuleLogs('ATROPOS', selectedSubscribers, selectedZones);
     
     return (
@@ -31,9 +30,8 @@ const AtroposDashboard: React.FC<AtroposDashboardProps> = ({ onBack }) => {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
                 <TrendChart title="Atropos Events Published Trend" data={trendData1} />
-                <TrendChart title="Atropos Feature Adoption Trend" data={trendData2} />
             </div>
             
             {/* Recent Logs */}

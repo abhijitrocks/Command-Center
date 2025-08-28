@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import TrendChart, { HistogramChart } from '../components/charts/TrendChart';
 import { getMessageAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getAtroposModuleMetrics, getPerseusModuleMetrics, getMessageAppTSheetData, getLatencyDistributionData } from '../data/mockData';
@@ -8,11 +8,17 @@ import { useDashboard } from '../contexts/DashboardContext';
 import { useView } from '../contexts/ViewContext';
 import { useJobRuns } from '../contexts/JobRunsContext';
 import TSheet from '../components/TSheet';
+import { SUBSCRIBERS } from '../constants';
 
 const MessageApplicationConsole: React.FC = () => {
   const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
   const { setView } = useView();
   const { openModal: openJobRunsModal } = useJobRuns();
+
+  const [logSubscriberFilter, setLogSubscriberFilter] = useState('all');
+  const [logSeverityFilter, setLogSeverityFilter] = useState('all');
+  const [logDateRange, setLogDateRange] = useState({ start: '', end: '' });
+  const [subscriberSearch, setSubscriberSearch] = useState('');
 
   const kpis = getMessageAppKpis(selectedSubscribers, selectedZones, selectedTimeRange);
   const nsmTrend = getTrendData('Events Trend', selectedSubscribers, selectedZones, selectedTimeRange);
@@ -24,6 +30,28 @@ const MessageApplicationConsole: React.FC = () => {
   const perseusMetrics = getPerseusModuleMetrics(selectedSubscribers, selectedZones, selectedTimeRange);
   const { metrics: tsheetMetrics, data: tsheetData, subscribers: tsheetSubscribers } = getMessageAppTSheetData(selectedSubscribers, selectedZones);
   const latencyData = getLatencyDistributionData(selectedSubscribers, selectedZones);
+
+  const displayedLogs = logs.filter(log => {
+    const logDate = new Date(log.timestamp);
+    const startDate = logDateRange.start ? new Date(logDateRange.start) : null;
+    const endDate = logDateRange.end ? new Date(logDateRange.end) : null;
+
+    if (startDate) startDate.setHours(0, 0, 0, 0);
+    if (endDate) endDate.setHours(23, 59, 59, 999);
+    
+    const subscriberName = SUBSCRIBERS.find(s => s.id === logSubscriberFilter)?.name || logSubscriberFilter;
+
+    return (
+        (logSubscriberFilter === 'all' || log.subscriber === subscriberName) &&
+        (logSeverityFilter === 'all' || log.severity === logSeverityFilter) &&
+        (!startDate || logDate >= startDate) &&
+        (!endDate || logDate <= endDate)
+    );
+  });
+  
+  const filteredSubscriberMetrics = subscriberMetrics.filter(metric =>
+    metric.subscriberName.toLowerCase().includes(subscriberSearch.toLowerCase())
+  );
 
   const handleTSheetMetricClick = (metric: TSheetMetric) => {
     console.log(`Drill-down triggered for metric: "${metric.label}"`);
@@ -105,8 +133,45 @@ const MessageApplicationConsole: React.FC = () => {
           {/* Logs */}
            <div className="bg-gray-800 p-4 rounded-lg">
             <h3 className="text-md font-semibold text-white mb-4">Logs & Signals</h3>
-            <div className="h-64 overflow-y-auto font-mono text-xs">
-                {logs.map(log => (
+             <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
+                <select
+                    value={logSubscriberFilter}
+                    onChange={(e) => setLogSubscriberFilter(e.target.value)}
+                    className="bg-gray-700 border-gray-600 rounded-md text-white px-2 py-1 focus:ring-brand-blue focus:border-brand-blue"
+                    aria-label="Filter logs by subscriber"
+                >
+                    {SUBSCRIBERS.map(s => <option key={s.id} value={s.id === 'all' ? 'all' : s.name}>{s.name}</option>)}
+                </select>
+                <select
+                    value={logSeverityFilter}
+                    onChange={(e) => setLogSeverityFilter(e.target.value)}
+                    className="bg-gray-700 border-gray-600 rounded-md text-white px-2 py-1 focus:ring-brand-blue focus:border-brand-blue"
+                    aria-label="Filter logs by severity"
+                >
+                    <option value="all">All Severities</option>
+                    <option value="INFO">INFO</option>
+                    <option value="WARN">WARN</option>
+                    <option value="ERROR">ERROR</option>
+                    <option value="DEBUG">DEBUG</option>
+                </select>
+                <input
+                    type="date"
+                    value={logDateRange.start}
+                    onChange={(e) => setLogDateRange(prev => ({ ...prev, start: e.target.value }))}
+                    className="bg-gray-700 border-gray-600 rounded-md text-white px-2 py-1 focus:ring-brand-blue focus:border-brand-blue"
+                    aria-label="Log filter start date"
+                />
+                <span className="text-gray-400">to</span>
+                <input
+                    type="date"
+                    value={logDateRange.end}
+                    onChange={(e) => setLogDateRange(prev => ({ ...prev, end: e.target.value }))}
+                    className="bg-gray-700 border-gray-600 rounded-md text-white px-2 py-1 focus:ring-brand-blue focus:border-brand-blue"
+                    aria-label="Log filter end date"
+                />
+              </div>
+            <div className="h-52 overflow-y-auto font-mono text-xs">
+                {displayedLogs.map(log => (
                     <div key={log.id} className={`flex items-start space-x-3 p-1 rounded ${log.severity === 'ERROR' ? 'bg-status-red/10' : ''} ${log.severity === 'WARN' ? 'bg-status-amber/10' : ''}`}>
                        <span className="text-gray-500">{log.timestamp.split('T')[1].replace('Z','')}</span>
                        <span className={`font-bold ${log.severity === 'ERROR' ? 'text-status-red' : log.severity === 'WARN' ? 'text-status-amber' : 'text-gray-400'}`}>{log.severity}</span>
@@ -121,7 +186,16 @@ const MessageApplicationConsole: React.FC = () => {
         {/* Right Sticky Column */}
         <div className="space-y-6">
             <div className="bg-gray-800 p-4 rounded-lg">
-                <h3 className="text-md font-semibold text-white mb-4">Subscribers</h3>
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-md font-semibold text-white">Subscribers</h3>
+                    <input
+                        type="text"
+                        placeholder="Search subscribers..."
+                        value={subscriberSearch}
+                        onChange={(e) => setSubscriberSearch(e.target.value)}
+                        className="bg-gray-700 border-gray-600 rounded-md text-white px-3 py-1.5 text-sm focus:ring-brand-blue focus:border-brand-blue w-48"
+                    />
+                </div>
                  <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-400 uppercase bg-gray-700/50">
@@ -135,7 +209,7 @@ const MessageApplicationConsole: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {subscriberMetrics.map(t => (
+                            {filteredSubscriberMetrics.map(t => (
                                 <tr key={t.subscriberId} className="border-b border-gray-700 hover:bg-gray-700/50">
                                     <td className="px-4 py-2 font-medium text-white">
                                         <button onClick={() => handleTenantClick(t.subscriberId)} className="hover:text-brand-blue hover:underline text-left transition-colors">

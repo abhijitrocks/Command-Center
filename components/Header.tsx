@@ -1,10 +1,13 @@
+
 import React, { useState } from 'react';
 // FIX: Removed TIME_RANGES from import as it does not exist in constants.ts
 import { SUBSCRIBERS, ZONES } from '../constants';
 import { useDashboard } from '../contexts/DashboardContext';
 import { Subscriber, TimeRange, Zone, View } from '../types';
-import { PlusIcon, ArrowPathIcon, ChevronDownIcon, DocumentTextIcon } from './icons';
+import { PlusIcon, ArrowPathIcon, ChevronDownIcon, DocumentTextIcon, BellIcon } from './icons';
 import { useView } from '../contexts/ViewContext';
+import { useAlerts } from '../contexts/AlertsContext';
+import NotificationsPanel from './NotificationsPanel';
 
 const Header: React.FC = () => {
     const { 
@@ -13,6 +16,8 @@ const Header: React.FC = () => {
         selectedZones, setSelectedZones
     } = useDashboard();
     const { setView } = useView();
+    const { unreadCount } = useAlerts();
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     
     // For multiselect subscriber dropdown
     const SubscriberDropdown = () => {
@@ -174,7 +179,7 @@ const Header: React.FC = () => {
     }
 
   return (
-    <header className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
+    <header className="relative flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
       <div>
         <h1 className="text-2xl font-bold text-white">Olympus HUB</h1>
         <p className="text-sm text-gray-400">File & Message Apps</p>
@@ -183,16 +188,32 @@ const Header: React.FC = () => {
         <SubscriberDropdown/>
         <ZoneDropdown />
         <TimeRangeDropdown />
-        <button className="bg-gray-700 p-2 rounded-md text-white hover:bg-gray-600" title="Create Alert" onClick={() => setView(View.ALERTS)}>
-            <PlusIcon />
+        <button 
+          onClick={() => setView(View.ALERTS)}
+          className="bg-brand-blue/80 hover:bg-brand-blue text-white font-semibold py-2 px-3 rounded-md transition-colors text-sm flex items-center space-x-1.5"
+          aria-label="Create new alert"
+        >
+            <PlusIcon className="h-4 w-4" />
+            <span>Create Alerts</span>
         </button>
         <button className="bg-gray-700 p-2 rounded-md text-white hover:bg-gray-600" title="New Engagement Task">
             <DocumentTextIcon />
+        </button>
+        <button 
+          onClick={() => setIsNotificationsOpen(prev => !prev)}
+          className="relative bg-gray-700 p-2 rounded-md text-white hover:bg-gray-600" title="Notifications">
+            <BellIcon className="h-5 w-5" />
+            {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-status-red text-xs font-bold text-white">
+                    {unreadCount}
+                </span>
+            )}
         </button>
         <button className="bg-gray-700 p-2 rounded-md text-white hover:bg-gray-600" title="Refresh">
             <ArrowPathIcon className="h-5 w-5" />
         </button>
       </div>
+      <NotificationsPanel isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
     </header>
   );
 };

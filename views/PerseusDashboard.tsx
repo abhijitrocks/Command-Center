@@ -51,38 +51,32 @@ const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
                 <TrendChart title="Perseus Error Rate Trend" data={trendData2} />
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                 <div className="bg-gray-800 p-4 rounded-lg">
-                    <h3 className="text-md font-semibold text-white mb-4">Batch Job Summary</h3>
-                    <div className="flex justify-around items-center h-full text-center py-6">
-                        <div
-                            className="cursor-pointer hover:opacity-80 transition-opacity p-2"
-                            onClick={() => openJobRunsModal('succeeded')}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openJobRunsModal('succeeded')}
-                            aria-label={`View ${batchJobSummary.jobsSucceeded.toLocaleString()} successful runs`}
-                        >
-                            <MetricWithChange value={batchJobSummary.jobsSucceeded.toLocaleString()} label="Successful Runs" change={batchJobSummary.jobsSucceededChange} positiveIsGood={true} />
-                        </div>
-                        <div
-                            className="cursor-pointer hover:opacity-80 transition-opacity p-2"
-                            onClick={() => openJobRunsModal('failed')}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openJobRunsModal('failed')}
-                            aria-label={`View ${batchJobSummary.jobsFailed.toLocaleString()} failed runs`}
-                        >
-                            <MetricWithChange value={batchJobSummary.jobsFailed.toLocaleString()} label="Failed Runs" change={batchJobSummary.jobsFailedChange} positiveIsGood={false} />
-                        </div>
-                        <div className="p-2">
-                           <MetricWithChange value={batchJobSummary.jobsRun.toLocaleString()} label={`Total Runs (${selectedTimeRange})`} change={batchJobSummary.jobsRunChange} positiveIsGood={true} />
-                        </div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+                <h3 className="text-md font-semibold text-white mb-4">Batch Job Summary</h3>
+                <div className="flex flex-wrap justify-center items-center gap-x-16 lg:gap-x-24 gap-y-8 text-center py-6">
+                    <div
+                        className="cursor-pointer hover:opacity-80 transition-opacity p-2"
+                        onClick={() => openJobRunsModal('succeeded')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openJobRunsModal('succeeded')}
+                        aria-label={`View ${batchJobSummary.jobsSucceeded.toLocaleString()} successful runs`}
+                    >
+                        <MetricWithChange value={batchJobSummary.jobsSucceeded.toLocaleString()} label="Successful Runs" change={batchJobSummary.jobsSucceededChange} positiveIsGood={true} />
                     </div>
-                </div>
-                <div className="bg-gray-800 p-4 rounded-lg">
-                    <h3 className="text-md font-semibold text-white mb-4">Operator Usage</h3>
-                    <p className="text-gray-400 text-center pt-8">Operator usage data not available.</p>
+                    <div
+                        className="cursor-pointer hover:opacity-80 transition-opacity p-2"
+                        onClick={() => openJobRunsModal('failed')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openJobRunsModal('failed')}
+                        aria-label={`View ${batchJobSummary.jobsFailed.toLocaleString()} failed runs`}
+                    >
+                        <MetricWithChange value={batchJobSummary.jobsFailed.toLocaleString()} label="Failed Runs" change={batchJobSummary.jobsFailedChange} positiveIsGood={false} />
+                    </div>
+                    <div className="p-2">
+                        <MetricWithChange value={batchJobSummary.jobsRun.toLocaleString()} label={`Total Runs (${selectedTimeRange})`} change={batchJobSummary.jobsRunChange} positiveIsGood={true} />
+                    </div>
                 </div>
             </div>
 

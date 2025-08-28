@@ -1,5 +1,6 @@
 import React from 'react';
 import { OlympusIcon, BellIcon, ChartBarIcon } from './icons';
+import { useAlerts } from '../contexts/AlertsContext';
 
 interface SidebarProps {
   selectedWorkbench: string;
@@ -7,8 +8,10 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedWorkbench, onSelectWorkbench }) => {
+  const { unreadCount } = useAlerts();
+  
   const workbenches = [
-    { name: 'Olympus HUB', nsm: '1.2M MFT', alerts: 3, icon: <ChartBarIcon /> },
+    { name: 'Olympus HUB', nsm: '1.2M MFT', alerts: unreadCount, icon: <ChartBarIcon /> },
   ];
 
   return (
