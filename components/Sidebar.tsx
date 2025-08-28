@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { OlympusIcon, BellIcon, ChartBarIcon } from './icons';
 
@@ -16,7 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedWorkbench, onSelectWorkbench 
     <div className="w-64 bg-gray-900 border-r border-gray-700 flex flex-col p-4 space-y-6">
       <div className="flex items-center space-x-3 px-2">
         <OlympusIcon className="h-8 w-8 text-brand-blue" />
-        <h1 className="text-xl font-bold text-white">Olympus</h1>
+        <h1 className="text-xl font-bold text-white">Command Center</h1>
       </div>
 
       <div className="flex-1 space-y-4">
@@ -49,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedWorkbench, onSelectWorkbench 
         </div>
          <div className="px-2">
             <button className="w-full text-sm text-brand-blue/80 hover:text-brand-blue text-left">+ Create Workbench</button>
-            <button className="w-full text-sm text-brand-blue/80 hover:text-brand-blue text-left mt-2">Manage Tenants</button>
+            <button className="w-full text-sm text-brand-blue/80 hover:text-brand-blue text-left mt-2">Manage Subscribers</button>
         </div>
       </div>
 

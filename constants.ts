@@ -1,13 +1,21 @@
 
-import { Tenant } from './types';
+import { Subscriber, Zone } from './types';
 
-export const TENANTS: Tenant[] = [
-  { id: 'all', name: 'All Tenants' },
-  { id: 'showroom', name: 'Showroom' },
-  { id: 'hdfc_uat', name: 'HDFC UAT' },
-  { id: 'hdfc_lz', name: 'HDFC LZ' },
-  { id: 'common_prod', name: 'Common Prod' },
-  { id: 'us', name: 'US' },
+export const ZONES: Zone[] = [
+  { id: 'all', name: 'All Zones' },
+  { id: 'us-east-1', name: 'US-East-1' },
+  { id: 'eu-west-1', name: 'EU-West-1' },
+  { id: 'apac-north-1', name: 'APAC-North-1' },
 ];
 
-export const TIME_RANGES = ['Last 1h', 'Last 24h', 'Last 7d', 'Last 30d'];
+export const SUBSCRIBERS: Subscriber[] = [
+  { id: 'all', name: 'All Subscribers', zoneId: 'all' },
+  { id: 'cardworks', name: 'Cardworks', zoneId: 'us-east-1' },
+  { id: 'sparrow', name: 'Sparrow', zoneId: 'apac-north-1' },
+  { id: 'hdfc', name: 'HDFC', zoneId: 'apac-north-1' },
+  { id: 'optum', name: 'Optum', zoneId: 'eu-west-1' },
+  { id: 'jenius_bank', name: 'Jenius Bank', zoneId: 'us-east-1' },
+  { id: 'lakestack', name: 'Lakestack', zoneId: 'us-east-1' },
+  { id: 'itp', name: 'ITP', zoneId: 'eu-west-1' },
+  { id: 'tachyon_credit', name: 'Tachyon Credit', zoneId: 'apac-north-1' },
+];

@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const createIcon = (path: React.ReactNode) => (props: React.SVGProps<SVGSVGElement>) => (
@@ -67,4 +66,28 @@ export const DocumentTextIcon = createIcon(
 
 export const ArrowUpRightIcon = createIcon(
     <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+);
+
+export const InformationCircleIcon = createIcon(
+  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+);
+
+export const XMarkIcon = createIcon(
+    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+);
+
+export const ArrowLeftIcon = createIcon(
+    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-11.293a1 1 0 00-1.414-1.414L8 9.586V7a1 1 0 00-2 0v6a1 1 0 001 1h6a1 1 0 000-2H8.414l4.293-4.293z" clipRule="evenodd" />
+);
+
+export const TrashIcon = createIcon(
+    <path fillRule="evenodd" d="M10 2a.75.75 0 01.75.75v.5a2 2 0 00-4.5 0v-.5A.75.75 0 0110 2zM8.5 4.75a.75.75 0 01.75.75v7.5a.75.75 0 01-1.5 0v-7.5a.75.75 0 01.75-.75zM11.5 5.5a.75.75 0 00-1.5 0v7.5a.75.75 0 001.5 0v-7.5zM3.375 5a1.5 1.5 0 00-1.5 1.5v9A1.5 1.5 0 003.375 17h13.25A1.5 1.5 0 0018.125 15.5v-9A1.5 1.5 0 0016.625 5H3.375z" clipRule="evenodd" />
+);
+
+export const ArrowUpIcon = createIcon(
+    <path fillRule="evenodd" d="M10 5a.75.75 0 01.53.22l3.25 3.25a.75.75 0 11-1.06 1.06L10 6.81l-2.72 2.72a.75.75 0 01-1.06-1.06l3.25-3.25A.75.75 0 0110 5z" clipRule="evenodd" />
+);
+
+export const ArrowDownIcon = createIcon(
+    <path fillRule="evenodd" d="M10 15a.75.75 0 01-.53-.22l-3.25-3.25a.75.75 0 011.06-1.06L10 13.19l2.72-2.72a.75.75 0 111.06 1.06l-3.25 3.25A.75.75 0 0110 15z" clipRule="evenodd" />
 );

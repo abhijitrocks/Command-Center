@@ -1,34 +1,73 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import FileApplicationConsole from './FileApplicationConsole';
 import MessageApplicationConsole from './MessageApplicationConsole';
-import { ConsoleTab } from '../types';
+import AdoptionConsole from './AdoptionConsole';
+import DiaDashboard from './DiaDashboard';
+import PerseusDashboard from './PerseusDashboard';
+import AtroposDashboard from './AtroposDashboard';
+import AlertsPage from './AlertsPage';
+import { ConsoleTab, View } from '../types';
+import { useView } from '../contexts/ViewContext';
+import TenantDetailView from './TenantDetailView';
 
 const WorkbenchPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ConsoleTab>(ConsoleTab.FILE_APP);
+  const { viewState, setView } = useView();
 
+  const handleBackToConsole = () => {
+    setView(View.CONSOLE);
+  };
+
+  const renderActiveView = () => {
+    switch (viewState.currentView) {
+      case View.DIA:
+        return <DiaDashboard onBack={handleBackToConsole} />;
+      case View.PERSEUS:
+        return <PerseusDashboard onBack={handleBackToConsole} />;
+      case View.ATROPOS:
+        return <AtroposDashboard onBack={handleBackToConsole} />;
+      case View.ALERTS:
+        return <AlertsPage />;
+      case View.TENANT_DETAIL:
+        return <TenantDetailView onBack={handleBackToConsole} />;
+      case View.CONSOLE:
+      default:
+        return (
+          <>
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex space-x-4">
+                <TabButton
+                  title={ConsoleTab.FILE_APP}
+                  isActive={activeTab === ConsoleTab.FILE_APP}
+                  onClick={() => setActiveTab(ConsoleTab.FILE_APP)}
+                />
+                <TabButton
+                  title={ConsoleTab.MESSAGE_APP}
+                  isActive={activeTab === ConsoleTab.MESSAGE_APP}
+                  onClick={() => setActiveTab(ConsoleTab.MESSAGE_APP)}
+                />
+                 <TabButton
+                  title={ConsoleTab.ADOPTION_USAGE}
+                  isActive={activeTab === ConsoleTab.ADOPTION_USAGE}
+                  onClick={() => setActiveTab(ConsoleTab.ADOPTION_USAGE)}
+                />
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              {activeTab === ConsoleTab.FILE_APP && <FileApplicationConsole />}
+              {activeTab === ConsoleTab.MESSAGE_APP && <MessageApplicationConsole />}
+              {activeTab === ConsoleTab.ADOPTION_USAGE && <AdoptionConsole />}
+            </div>
+          </>
+        );
+    }
+  };
+  
   return (
     <div className="flex-1 flex flex-col bg-gray-900">
       <Header />
-      <div className="p-6 border-b border-gray-700">
-        <div className="flex space-x-4">
-          <TabButton
-            title={ConsoleTab.FILE_APP}
-            isActive={activeTab === ConsoleTab.FILE_APP}
-            onClick={() => setActiveTab(ConsoleTab.FILE_APP)}
-          />
-          <TabButton
-            title={ConsoleTab.MESSAGE_APP}
-            isActive={activeTab === ConsoleTab.MESSAGE_APP}
-            onClick={() => setActiveTab(ConsoleTab.MESSAGE_APP)}
-          />
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto p-6">
-        {activeTab === ConsoleTab.FILE_APP && <FileApplicationConsole />}
-        {activeTab === ConsoleTab.MESSAGE_APP && <MessageApplicationConsole />}
-      </div>
+      {renderActiveView()}
     </div>
   );
 };

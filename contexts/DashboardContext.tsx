@@ -1,28 +1,33 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { TENANTS } from '../constants';
-import { Tenant, TimeRange } from '../types';
+import { SUBSCRIBERS, ZONES } from '../constants';
+import { Subscriber, TimeRange, Zone } from '../types';
 
 interface DashboardContextType {
   selectedTimeRange: TimeRange;
   setSelectedTimeRange: (timeRange: TimeRange) => void;
-  selectedTenants: Tenant[];
-  setSelectedTenants: (tenants: Tenant[]) => void;
+  selectedSubscribers: Subscriber[];
+  setSelectedSubscribers: (subscribers: Subscriber[]) => void;
+  selectedZones: Zone[];
+  setSelectedZones: (zones: Zone[]) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>(TimeRange.LAST_24H);
-  const [selectedTenants, setSelectedTenants] = useState<Tenant[]>([TENANTS[0]]);
+  const [selectedSubscribers, setSelectedSubscribers] = useState<Subscriber[]>([SUBSCRIBERS[0]]);
+  const [selectedZones, setSelectedZones] = useState<Zone[]>([ZONES[0]]);
 
   return (
     <DashboardContext.Provider
       value={{
         selectedTimeRange,
         setSelectedTimeRange,
-        selectedTenants,
-        setSelectedTenants,
+        selectedSubscribers,
+        setSelectedSubscribers,
+        selectedZones,
+        setSelectedZones,
       }}
     >
       {children}
