@@ -47,7 +47,8 @@ const getFilterFactor = (subscribers: Subscriber[], zones: Zone[]): number => {
         seed += subscribers.reduce((acc, t) => acc + t.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0), 0);
     }
      if (!isAllZones) {
-        seed += zones.reduce((acc, z) => acc + z.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0), 0), 0);
+        seed += zones.reduce((acc, z) => acc + z.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0), 0);
+
     }
 
     const random = Math.sin(seed) * 10000;
