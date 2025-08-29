@@ -47,7 +47,16 @@ const getFilterFactor = (subscribers: Subscriber[], zones: Zone[]): number => {
         seed += subscribers.reduce((acc, t) => acc + t.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0), 0);
     }
      if (!isAllZones) {
-        seed += zones.reduce((acc, z) => acc + z.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0), 0);
+        // safer, readable replacement for adding zones char-code sum to seed
+if (!isAllZones && Array.isArray(zones) && zones.length > 0) {
+  const zoneCharsSum = zones.reduce((acc, z) => {
+    const idStr = String(z?.id ?? '');
+    const idSum = [...idStr].reduce((s, ch) => s + ch.charCodeAt(0), 0);
+    return acc + idSum;
+  }, 0);
+  seed += zoneCharsSum;
+}
+
 
     }
 
