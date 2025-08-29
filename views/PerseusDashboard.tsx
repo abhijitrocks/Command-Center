@@ -1,34 +1,50 @@
 import React from 'react';
 import KpiCard from '../components/KpiCard';
 import TrendChart from '../components/charts/TrendChart';
-import { ArrowLeftIcon } from '../components/icons';
-import { getPerseusDashboardKpis, getTrendData, getBatchJobSummary, getModuleLogs } from '../data/mockData';
+import { ArrowLeftIcon, InformationCircleIcon } from '../components/icons';
+import { getPerseusDashboardKpis, getTrendData, getModuleLogs, getPerseusCategorizedMetrics } from '../data/mockData';
 import { useDashboard } from '../contexts/DashboardContext';
-import { useJobRuns } from '../contexts/JobRunsContext';
+import { ModuleMetric } from '../types';
+import Tooltip from '../components/Tooltip';
 
 interface PerseusDashboardProps {
     onBack: () => void;
 }
 
-const MetricWithChange = ({ value, label, change, positiveIsGood }: { value: string, label: string, change: string, positiveIsGood: boolean }) => {
-    const isPositive = change.startsWith('+');
-    const changeColor = (isPositive && positiveIsGood) || (!isPositive && !positiveIsGood) ? 'text-status-green' : 'text-status-red';
-    return (
-        <div className="text-center p-2">
-            <p className="text-3xl font-bold text-white">{value}</p>
-            <p className="text-xs text-gray-400 mt-1">{label}</p>
-            <p className={`text-xs font-semibold ${changeColor}`}>{change}</p>
-        </div>
-    );
+const statusColors: { [key: string]: string } = {
+  green: 'text-status-green',
+  amber: 'text-status-amber',
+  red: 'text-status-red',
+  neutral: 'text-white'
 };
+
+const MetricDisplay: React.FC<{ metric: ModuleMetric }> = ({ metric }) => (
+    <div>
+        <div className="flex items-center space-x-1.5">
+            <p className="text-sm text-gray-400">{metric.name}</p>
+            <Tooltip content={metric.description}>
+                <InformationCircleIcon className="h-4 w-4 text-gray-500" />
+            </Tooltip>
+        </div>
+        <p className={`text-2xl font-bold ${statusColors[metric.status]}`}>{metric.value}</p>
+    </div>
+);
+
+const MetricCategoryCard: React.FC<{ title: string; metrics: ModuleMetric[] }> = ({ title, metrics }) => (
+    <div className="bg-gray-800 p-6 rounded-lg h-full">
+        <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+            {metrics.map(metric => <MetricDisplay key={metric.id} metric={metric} />)}
+        </div>
+    </div>
+);
 
 const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
     const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
-    const { openModal: openJobRunsModal } = useJobRuns();
     const kpis = getPerseusDashboardKpis(selectedSubscribers, selectedZones, selectedTimeRange);
-    const trendData1 = getTrendData('Perseus MJR Trend', selectedSubscribers, selectedZones, selectedTimeRange);
-    const trendData2 = getTrendData('Perseus Error Rate Trend', selectedSubscribers, selectedZones, selectedTimeRange);
-    const batchJobSummary = getBatchJobSummary(selectedSubscribers, selectedZones, selectedTimeRange);
+    const jobRunsTrendData = getTrendData('Perseus Job Runs Trend', selectedSubscribers, selectedZones, selectedTimeRange);
+    const errorRateTrendData = getTrendData('Perseus Error Rate Trend', selectedSubscribers, selectedZones, selectedTimeRange);
+    const categorizedMetrics = getPerseusCategorizedMetrics(selectedSubscribers, selectedZones, selectedTimeRange);
     const logs = getModuleLogs('PERSEUS', selectedSubscribers, selectedZones);
 
     return (
@@ -47,38 +63,18 @@ const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <TrendChart title="Perseus Job Runs Trend" data={trendData1} />
-                <TrendChart title="Perseus Error Rate Trend" data={trendData2} />
+                <TrendChart title="Perseus Job Runs Trend" data={jobRunsTrendData} />
+                <TrendChart title="Perseus Error Rate Trend" data={errorRateTrendData} />
             </div>
-            
-            <div className="bg-gray-800 p-4 rounded-lg">
-                <h3 className="text-md font-semibold text-white mb-4">Batch Job Summary</h3>
-                <div className="flex flex-wrap justify-center items-center gap-x-16 lg:gap-x-24 gap-y-8 text-center py-6">
-                    <div
-                        className="cursor-pointer hover:opacity-80 transition-opacity p-2"
-                        onClick={() => openJobRunsModal('succeeded')}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openJobRunsModal('succeeded')}
-                        aria-label={`View ${batchJobSummary.jobsSucceeded.toLocaleString()} successful runs`}
-                    >
-                        <MetricWithChange value={batchJobSummary.jobsSucceeded.toLocaleString()} label="Successful Runs" change={batchJobSummary.jobsSucceededChange} positiveIsGood={true} />
-                    </div>
-                    <div
-                        className="cursor-pointer hover:opacity-80 transition-opacity p-2"
-                        onClick={() => openJobRunsModal('failed')}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openJobRunsModal('failed')}
-                        aria-label={`View ${batchJobSummary.jobsFailed.toLocaleString()} failed runs`}
-                    >
-                        <MetricWithChange value={batchJobSummary.jobsFailed.toLocaleString()} label="Failed Runs" change={batchJobSummary.jobsFailedChange} positiveIsGood={false} />
-                    </div>
-                    <div className="p-2">
-                        <MetricWithChange value={batchJobSummary.jobsRun.toLocaleString()} label={`Total Runs (${selectedTimeRange})`} change={batchJobSummary.jobsRunChange} positiveIsGood={true} />
-                    </div>
-                </div>
+
+            {/* Categorized Metrics */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <MetricCategoryCard title="Health" metrics={categorizedMetrics.health} />
+                <MetricCategoryCard title="Performance" metrics={categorizedMetrics.performance} />
+                <MetricCategoryCard title="Business" metrics={categorizedMetrics.business} />
+                <MetricCategoryCard title="Feature Usage" metrics={categorizedMetrics.featureUsage} />
             </div>
+
 
             {/* Recent Logs */}
             <div className="bg-gray-800 p-4 rounded-lg">

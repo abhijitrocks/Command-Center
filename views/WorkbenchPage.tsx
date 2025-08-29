@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import FileApplicationConsole from './FileApplicationConsole';
 import MessageApplicationConsole from './MessageApplicationConsole';
-import AdoptionConsole from './AdoptionConsole';
 import DiaDashboard from './DiaDashboard';
 import PerseusDashboard from './PerseusDashboard';
 import AtroposDashboard from './AtroposDashboard';
@@ -47,17 +46,11 @@ const WorkbenchPage: React.FC = () => {
                   isActive={activeTab === ConsoleTab.MESSAGE_APP}
                   onClick={() => setActiveTab(ConsoleTab.MESSAGE_APP)}
                 />
-                 <TabButton
-                  title={ConsoleTab.ADOPTION_USAGE}
-                  isActive={activeTab === ConsoleTab.ADOPTION_USAGE}
-                  onClick={() => setActiveTab(ConsoleTab.ADOPTION_USAGE)}
-                />
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               {activeTab === ConsoleTab.FILE_APP && <FileApplicationConsole />}
               {activeTab === ConsoleTab.MESSAGE_APP && <MessageApplicationConsole />}
-              {activeTab === ConsoleTab.ADOPTION_USAGE && <AdoptionConsole />}
             </div>
           </>
         );
