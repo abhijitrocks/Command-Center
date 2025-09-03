@@ -617,118 +617,44 @@ export const getJobRuns = (subscribers: Subscriber[] = [], zones: Zone[] = [], s
 
 // --- T-Sheet Data for Message Application ---
 
-export const MESSAGE_APP_TSHEET_METRICS: TSheetMetric[] = [
+export const MESSAGE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
+    { key: 'group_topics', label: 'Topics & Messages', isGroupHeader: true, isGroupSeparator: false, color: 'bg-brand-blue/20' },
     { key: 'topics', label: 'Number of topics', isGroupSeparator: false },
     { key: 'msgPublished', label: 'Number of Message Published', isGroupSeparator: false },
-    { key: 'subscriptions', label: 'Number of subscriptions', isGroupSeparator: true },
+    
+    { key: 'group_subs', label: 'Subscriptions', isGroupHeader: true, isGroupSeparator: true, color: 'bg-brand-purple/20' },
+    { key: 'subscriptions', label: 'Number of subscriptions', isGroupSeparator: false },
     { key: 'msgProcessedBySub', label: 'Number of Messages Processed By Subscriptions', isGroupSeparator: false },
     { key: 'msgConsumedBySub', label: 'Number of Messages Consumed By Subscriptions', isGroupSeparator: false },
-    { key: 'msgApps', label: 'Number of Message Apps', isGroupSeparator: true },
+    
+    { key: 'group_apps', label: 'Message Applications', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-green/20' },
+    { key: 'msgApps', label: 'Number of Message Apps', isGroupSeparator: false },
     { key: 'msgProcessedByApp', label: 'Number of Messages Processed By Message Applications', isGroupSeparator: false },
     { key: 'msgConsumedByApp', label: 'Number of Messages Consumed By Message Applications', isGroupSeparator: false },
-    { key: 'schedulesCreated', label: 'Number of Schedules Created', isGroupSeparator: true },
+
+    { key: 'group_schedules', label: 'Schedules', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-amber/20' },
+    { key: 'schedulesCreated', label: 'Number of Schedules Created', isGroupSeparator: false },
     { key: 'schedulesTriggered', label: 'Number of Schedules triggered', isGroupSeparator: false },
 ];
 
-const T_SHEET_MESSAGE_APP_BASE_DATA: TSheetData = {
-    'Cardworks': { topics: '1200', msgPublished: '15 Mil', subscriptions: '7500', msgProcessedBySub: '12 Mil', msgConsumedBySub: '2.5 Bil', msgApps: '35', msgProcessedByApp: '55K', msgConsumedByApp: '140K', schedulesCreated: '450', schedulesTriggered: '100K' },
-    'Sparrow': { topics: '80', msgPublished: '1.2 Mil', subscriptions: '150', msgProcessedBySub: '7.5 Mil', msgConsumedBySub: '15 Mil', msgApps: 'NA', msgProcessedByApp: 'NA', msgConsumedByApp: 'NA', schedulesCreated: '10', schedulesTriggered: '700' },
-    'HDFC': { topics: '350', msgPublished: '40 Mil', subscriptions: '1000', msgProcessedBySub: '150 Mil', msgConsumedBySub: '300 Mil', msgApps: '2', msgProcessedByApp: '3K', msgConsumedByApp: '3K', schedulesCreated: '160', schedulesTriggered: '25K' },
-    'Optum': { topics: '600', msgPublished: '30 Mil', subscriptions: '1200', msgProcessedBySub: '55 Mil', msgConsumedBySub: '95 Mil', msgApps: '50', msgProcessedByApp: '100K', msgConsumedByApp: '15 Mil', schedulesCreated: '50', schedulesTriggered: '20K' },
-    'Jenius Bank': { topics: '250', msgPublished: '5 Mil', subscriptions: '500', msgProcessedBySub: '10 Mil', msgConsumedBySub: '20 Mil', msgApps: '10', msgProcessedByApp: '15K', msgConsumedByApp: '30K', schedulesCreated: '30', schedulesTriggered: '5K' },
-    'Lakestack': { topics: '150', msgPublished: '2 Mil', subscriptions: '300', msgProcessedBySub: '4 Mil', msgConsumedBySub: '8 Mil', msgApps: '5', msgProcessedByApp: '10K', msgConsumedByApp: '20K', schedulesCreated: '20', schedulesTriggered: '3K' },
-    'ITP': { topics: '400', msgPublished: '8 Mil', subscriptions: '800', msgProcessedBySub: '16 Mil', msgConsumedBySub: '32 Mil', msgApps: '20', msgProcessedByApp: '40K', msgConsumedByApp: '80K', schedulesCreated: '60', schedulesTriggered: '12K' },
-    'Tachyon Credit': { topics: '180', msgPublished: '3 Mil', subscriptions: '400', msgProcessedBySub: '6 Mil', msgConsumedBySub: '12 Mil', msgApps: '8', msgProcessedByApp: '12K', msgConsumedByApp: '24K', schedulesCreated: '25', schedulesTriggered: '4K' }
-};
-
-export const getMessageAppHeroMetrics = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): MessageAppHeroMetrics => {
-    const baseData = T_SHEET_MESSAGE_APP_BASE_DATA;
-    const allTSheetSubscriberNames = Object.keys(baseData);
-    let subscribersToShow: string[] = [];
-    const isAllSubscribersSelected = !selectedSubscribers || selectedSubscribers.length === 0 || selectedSubscribers.some(s => s.id === 'all');
-    const isAllZonesSelected = !selectedZones || selectedZones.length === 0 || selectedZones.some(z => z.id === 'all');
-
-    if (isAllSubscribersSelected) {
-        if (isAllZonesSelected) {
-            subscribersToShow = allTSheetSubscriberNames;
-        } else {
-            const selectedZoneIds = selectedZones.map(z => z.id);
-            const subscribersInZone = SUBSCRIBERS
-                .filter(s => s.id !== 'all' && selectedZoneIds.includes(s.zoneId))
-                .map(s => s.name);
-            subscribersToShow = allTSheetSubscriberNames.filter(name => subscribersInZone.includes(name));
-        }
-    } else {
-        subscribersToShow = selectedSubscribers.map(s => s.name).filter(name => allTSheetSubscriberNames.includes(name));
-    }
-
-    const filteredData = Object.fromEntries(
-        Object.entries(baseData).filter(([subscriberName]) => subscribersToShow.includes(subscriberName))
-    );
-
-    const totals: { [key: string]: number } = {};
-    MESSAGE_APP_TSHEET_METRICS.forEach(metric => {
-        totals[metric.key] = 0;
-    });
-
-    for (const subscriberName in filteredData) {
-        for (const metricKey in filteredData[subscriberName]) {
-            totals[metricKey] += parseUnitString(filteredData[subscriberName][metricKey]);
-        }
-    }
-
-    return {
-        topicsAndMessages: [
-            { id: 'hero_topics', name: 'Number of topics', value: formatNumber(totals.topics), status: 'neutral', description: 'Total number of active topics.' },
-            { id: 'hero_msgPublished', name: 'Number of Message Published', value: formatNumber(totals.msgPublished), status: 'neutral', description: 'Total number of messages published across all topics.' },
-        ],
-        subscriptions: [
-            { id: 'hero_subscriptions', name: 'Number of subscriptions', value: formatNumber(totals.subscriptions), status: 'neutral', description: 'Total number of subscriptions to topics.' },
-            { id: 'hero_msgProcessedBySub', name: 'Messages Processed By Subscriptions', value: formatNumber(totals.msgProcessedBySub), status: 'neutral', description: 'Total number of messages successfully processed by subscriptions.' },
-            { id: 'hero_msgConsumedBySub', name: 'Messages Consumed By Subscriptions', value: formatNumber(totals.msgConsumedBySub), status: 'neutral', description: 'Total number of messages consumed from subscriptions.' },
-        ],
-        messageApps: [
-            { id: 'hero_msgApps', name: 'Number of Message Apps', value: formatNumber(totals.msgApps), status: 'neutral', description: 'Total number of applications integrated as message producers or consumers.' },
-            { id: 'hero_msgProcessedByApp', name: 'Messages Processed By Message Apps', value: formatNumber(totals.msgProcessedByApp), status: 'neutral', description: 'Total messages processed by integrated message applications.' },
-            { id: 'hero_msgConsumedByApp', name: 'Messages Consumed By Message Apps', value: formatNumber(totals.msgConsumedByApp), status: 'neutral', description: 'Total messages consumed by integrated message applications.' },
-        ],
-        schedules: [
-            { id: 'hero_schedulesCreated', name: 'Number of Schedules Created', value: formatNumber(totals.schedulesCreated), status: 'neutral', description: 'Total number of scheduled jobs created.' },
-            { id: 'hero_schedulesTriggered', name: 'Number of Schedules triggered', value: formatNumber(totals.schedulesTriggered), status: 'neutral', description: 'Total number of times scheduled jobs have been triggered.' },
-        ],
+export const getMessageAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
+    const today = new Date().toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
+    const tillDateHeader = `Till Date (${today})`;
+    
+    const timeBasedTSheetData: TSheetData = {
+        'Last 1 hour':    { topics: '1', msgPublished: '700', subscriptions: '5', msgProcessedBySub: '25K', msgConsumedBySub: '1K', msgApps: '4K', msgProcessedByApp: '1K', msgConsumedByApp: '1K', schedulesCreated: '1', schedulesTriggered: '15' },
+        'Last 24 h':   { topics: '2', msgPublished: '10.0K', subscriptions: '20', msgProcessedBySub: '80K', msgConsumedBySub: '5K', msgApps: '15K', msgProcessedByApp: '10K', msgConsumedByApp: '12K', schedulesCreated: '6', schedulesTriggered: '45' },
+        'Last 7 days':  { topics: '5', msgPublished: '35.0K', subscriptions: '80', msgProcessedBySub: '260K', msgConsumedBySub: '20K', msgApps: '50K', msgProcessedByApp: '40K', msgConsumedByApp: '55K', schedulesCreated: '5', schedulesTriggered: '120' },
+        'Last 30 days': { topics: '8', msgPublished: '40.0K', subscriptions: '120', msgProcessedBySub: '300K', msgConsumedBySub: '25K', msgApps: '60K', msgProcessedByApp: '50K', msgConsumedByApp: '70K', schedulesCreated: '15', schedulesTriggered: '170' },
+        [tillDateHeader]: { topics: '10', msgPublished: '42.5K', subscriptions: '125', msgProcessedBySub: '310K', msgConsumedBySub: '26K', msgApps: '62K', msgProcessedByApp: '52K', msgConsumedByApp: '73K', schedulesCreated: '16', schedulesTriggered: '175' }
     };
-};
-
-export const getMessageAppTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; subscribers: string[] } => {
-    const baseData = T_SHEET_MESSAGE_APP_BASE_DATA;
-    const allTSheetSubscriberNames = Object.keys(baseData);
-    let subscribersToShow: string[] = [];
-
-    const isAllSubscribersSelected = !selectedSubscribers || selectedSubscribers.length === 0 || selectedSubscribers.some(s => s.id === 'all');
-    const isAllZonesSelected = !selectedZones || selectedZones.length === 0 || selectedZones.some(z => z.id === 'all');
-
-    if (isAllSubscribersSelected) {
-        if (isAllZonesSelected) {
-            subscribersToShow = allTSheetSubscriberNames;
-        } else {
-            const selectedZoneIds = selectedZones.map(z => z.id);
-            const subscribersInZone = SUBSCRIBERS
-                .filter(s => s.id !== 'all' && selectedZoneIds.includes(s.zoneId))
-                .map(s => s.name);
-            subscribersToShow = allTSheetSubscriberNames.filter(name => subscribersInZone.includes(name));
-        }
-    } else {
-        subscribersToShow = selectedSubscribers.map(s => s.name).filter(name => allTSheetSubscriberNames.includes(name));
-    }
-
-    const filteredData = Object.fromEntries(
-        Object.entries(baseData).filter(([subscriberName]) => subscribersToShow.includes(subscriberName))
-    );
+    
+    const timeRangesForTSheet = ['Last 1 hour', 'Last 24 h', 'Last 7 days', 'Last 30 days', tillDateHeader];
 
     return {
-        metrics: MESSAGE_APP_TSHEET_METRICS,
-        data: filteredData,
-        subscribers: subscribersToShow,
+        metrics: MESSAGE_APP_TIME_BASED_TSHEET_METRICS,
+        data: timeBasedTSheetData,
+        timeRanges: timeRangesForTSheet,
     };
 };
 

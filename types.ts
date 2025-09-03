@@ -187,6 +187,8 @@ export interface TSheetMetric {
   key: string;
   label: string;
   isGroupSeparator: boolean; // To add top padding/border for visual grouping
+  isGroupHeader?: boolean;
+  color?: string;
 }
 
 export interface TSheetData {

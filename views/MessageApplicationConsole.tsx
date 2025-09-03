@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import TrendChart, { HistogramChart } from '../components/charts/TrendChart';
-import { getMessageAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getAtroposModuleMetrics, getPerseusModuleMetrics, getMessageAppTSheetData, getLatencyDistributionData, getMessageAppHeroMetrics } from '../data/mockData';
+import { getMessageAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getAtroposModuleMetrics, getPerseusModuleMetrics, getMessageAppTimeBasedTSheetData, getLatencyDistributionData, getDrilldownData } from '../data/mockData';
 import { FailureReason, TSheetMetric, View } from '../types';
 import ModuleStatusCard from '../components/ModuleStatusCard';
 import { useDashboard } from '../contexts/DashboardContext';
@@ -10,12 +9,13 @@ import { useView } from '../contexts/ViewContext';
 import { useJobRuns } from '../contexts/JobRunsContext';
 import TSheet from '../components/TSheet';
 import { SUBSCRIBERS } from '../constants';
-import MessageAppHeroMetrics from '../components/MessageAppHeroMetrics';
+import { useDrilldown } from '../contexts/DrilldownContext';
 
 const MessageApplicationConsole: React.FC = () => {
   const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
   const { setView } = useView();
   const { openModal: openJobRunsModal } = useJobRuns();
+  const { openDrilldown } = useDrilldown();
 
   const [logSubscriberFilter, setLogSubscriberFilter] = useState('all');
   const [logSeverityFilter, setLogSeverityFilter] = useState('all');
@@ -24,7 +24,6 @@ const MessageApplicationConsole: React.FC = () => {
 
   const kpis = getMessageAppKpis(selectedSubscribers, selectedZones, selectedTimeRange);
   const filteredKpis = kpis.filter(kpi => kpi.id !== 'events_published');
-  const heroMetrics = getMessageAppHeroMetrics(selectedSubscribers, selectedZones);
   const nsmTrend = getTrendData('Events Trend', selectedSubscribers, selectedZones, selectedTimeRange);
   const errorTrend = getTrendData('Error Rate Trend', selectedSubscribers, selectedZones, selectedTimeRange);
   const failureReasons = getTopFailureReasons(selectedSubscribers, selectedZones).slice(0,5).map(r => ({...r, reason: r.reason.replace('file', 'event')}));
@@ -32,7 +31,7 @@ const MessageApplicationConsole: React.FC = () => {
   const subscriberMetrics = getSubscribersMetrics(selectedSubscribers, selectedZones);
   const atroposMetrics = getAtroposModuleMetrics(selectedSubscribers, selectedZones, selectedTimeRange);
   const perseusMetrics = getPerseusModuleMetrics(selectedSubscribers, selectedZones, selectedTimeRange);
-  const { metrics: tsheetMetrics, data: tsheetData, subscribers: tsheetSubscribers } = getMessageAppTSheetData(selectedSubscribers, selectedZones);
+  const { metrics: tsheetMetrics, data: tsheetData, timeRanges: tsheetColumns } = getMessageAppTimeBasedTSheetData(selectedSubscribers, selectedZones);
   const latencyData = getLatencyDistributionData(selectedSubscribers, selectedZones);
 
   const displayedLogs = logs.filter(log => {
@@ -58,12 +57,8 @@ const MessageApplicationConsole: React.FC = () => {
   );
 
   const handleTSheetMetricClick = (metric: TSheetMetric) => {
-    console.log(`Drill-down triggered for metric: "${metric.label}"`);
-    console.log('Current Context:', {
-        timeRange: selectedTimeRange,
-        subscribers: selectedSubscribers.map(s => s.name),
-        zones: selectedZones.map(z => z.name),
-    });
+    const drilldownData = getDrilldownData(metric.key, metric.label, selectedSubscribers, selectedZones);
+    openDrilldown(drilldownData);
   };
 
   const handleTenantClick = (tenantId: string) => {
@@ -72,9 +67,16 @@ const MessageApplicationConsole: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics */}
-      <MessageAppHeroMetrics data={heroMetrics} />
-      
+      {/* T-Sheet Metrics */}
+      <TSheet 
+        title="Message Application Metrics (T-Sheet)" 
+        header="Metric"
+        metrics={tsheetMetrics} 
+        data={tsheetData} 
+        columns={tsheetColumns} 
+        onMetricClick={handleTSheetMetricClick}
+      />
+
       {/* KPI Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredKpis.map((kpi) => (
@@ -87,16 +89,6 @@ const MessageApplicationConsole: React.FC = () => {
           <ModuleStatusCard title="Atropos Module Status" metrics={atroposMetrics} onExpand={() => setView(View.ATROPOS)} />
           <ModuleStatusCard title="Perseus Module Status" metrics={perseusMetrics} onExpand={() => setView(View.PERSEUS)} />
       </div>
-      
-      {/* T-Sheet Metrics */}
-      <TSheet 
-        title="Message Application Metrics (T-Sheet)" 
-        header="Metric"
-        metrics={tsheetMetrics} 
-        data={tsheetData} 
-        subscribers={tsheetSubscribers} 
-        onMetricClick={handleTSheetMetricClick}
-      />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

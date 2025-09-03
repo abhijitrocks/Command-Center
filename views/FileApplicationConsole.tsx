@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import TrendChart, { HistogramChart } from '../components/charts/TrendChart';
-import { getFileAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getBatchJobSummary, getLatencyDistributionData, getTracesData, getDiaModuleMetrics, getPerseusModuleMetrics, getFileAppTimeBasedTSheetData } from '../data/mockData';
+import { getFileAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getBatchJobSummary, getLatencyDistributionData, getTracesData, getDiaModuleMetrics, getPerseusModuleMetrics, getFileAppTimeBasedTSheetData, getDrilldownData } from '../data/mockData';
 import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ArrowUpRightIcon } from '../components/icons';
 import { FailureReason, TSheetMetric, View } from '../types';
 import ModuleStatusCard from '../components/ModuleStatusCard';
@@ -10,6 +10,7 @@ import { useView } from '../contexts/ViewContext';
 import { useJobRuns } from '../contexts/JobRunsContext';
 import TSheet from '../components/TSheet';
 import { SUBSCRIBERS } from '../constants';
+import { useDrilldown } from '../contexts/DrilldownContext';
 
 const MetricWithChange = ({ value, label, change, positiveIsGood }: { value: string, label: string, change: string, positiveIsGood: boolean }) => {
     const isPositive = change.startsWith('+');
@@ -27,6 +28,7 @@ const FileApplicationConsole: React.FC = () => {
   const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
   const { setView } = useView();
   const { openModal: openJobRunsModal } = useJobRuns();
+  const { openDrilldown } = useDrilldown();
 
   const [logSubscriberFilter, setLogSubscriberFilter] = useState('all');
   const [logSeverityFilter, setLogSeverityFilter] = useState('all');
@@ -70,12 +72,8 @@ const FileApplicationConsole: React.FC = () => {
   );
 
   const handleTSheetMetricClick = (metric: TSheetMetric) => {
-    console.log(`Drill-down triggered for metric: "${metric.label}"`);
-    console.log('Current Context:', {
-        timeRange: selectedTimeRange,
-        subscribers: selectedSubscribers.map(s => s.name),
-        zones: selectedZones.map(z => z.name),
-    });
+    const drilldownData = getDrilldownData(metric.key, metric.label, selectedSubscribers, selectedZones);
+    openDrilldown(drilldownData);
   };
 
   const handleTenantClick = (tenantId: string) => {
@@ -90,7 +88,7 @@ const FileApplicationConsole: React.FC = () => {
         header="Metric"
         metrics={tsheetMetrics}
         data={tsheetData}
-        subscribers={tsheetColumns}
+        columns={tsheetColumns}
         onMetricClick={handleTSheetMetricClick}
       />
       
