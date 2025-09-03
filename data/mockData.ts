@@ -619,21 +619,21 @@ export const getJobRuns = (subscribers: Subscriber[] = [], zones: Zone[] = [], s
 
 export const MESSAGE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
     { key: 'group_topics', label: 'Topics & Messages', isGroupHeader: true, isGroupSeparator: false, color: 'bg-brand-blue/20' },
-    { key: 'topics', label: 'Number of topics', isGroupSeparator: false },
+    { key: 'topics', label: 'Number of topics created', isGroupSeparator: false },
     { key: 'msgPublished', label: 'Number of Message Published', isGroupSeparator: false },
     
     { key: 'group_subs', label: 'Subscriptions', isGroupHeader: true, isGroupSeparator: true, color: 'bg-brand-purple/20' },
-    { key: 'subscriptions', label: 'Number of subscriptions', isGroupSeparator: false },
+    { key: 'subscriptions', label: 'Number of subscriptions created', isGroupSeparator: false },
     { key: 'msgProcessedBySub', label: 'Number of Messages Processed By Subscriptions', isGroupSeparator: false },
     { key: 'msgConsumedBySub', label: 'Number of Messages Consumed By Subscriptions', isGroupSeparator: false },
     
     { key: 'group_apps', label: 'Message Applications', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-green/20' },
-    { key: 'msgApps', label: 'Number of Message Apps', isGroupSeparator: false },
+    { key: 'msgApps', label: 'Number of Message Apps created', isGroupSeparator: false },
     { key: 'msgProcessedByApp', label: 'Number of Messages Processed By Message Applications', isGroupSeparator: false },
     { key: 'msgConsumedByApp', label: 'Number of Messages Consumed By Message Applications', isGroupSeparator: false },
 
     { key: 'group_schedules', label: 'Schedules', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-amber/20' },
-    { key: 'schedulesCreated', label: 'Number of Schedules Created', isGroupSeparator: false },
+    { key: 'schedulesCreated', label: 'Number of Schedules created', isGroupSeparator: false },
     { key: 'schedulesTriggered', label: 'Number of Schedules triggered', isGroupSeparator: false },
 ];
 
@@ -661,14 +661,17 @@ export const getMessageAppTimeBasedTSheetData = (selectedSubscribers: Subscriber
 // --- T-Sheet Data for File Application ---
 
 export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
-    { key: 'numFileApps', label: 'Number of File applications', isGroupSeparator: false },
+    { key: 'group_apps', label: 'File Applications & Transfers', isGroupHeader: true, isGroupSeparator: false, color: 'bg-brand-blue/20' },
+    { key: 'numFileApps', label: 'Number of File Applications Created', isGroupSeparator: false },
     { key: 'filesProcessed', label: 'No of files processed', isGroupSeparator: false },
     { key: 'totalDownloads', label: 'Total File Downloads', isGroupSeparator: false },
     { key: 'totalUploads', label: 'Total File Uploads', isGroupSeparator: false },
-    { key: 'jobRuns', label: 'Job Runs', isGroupSeparator: true },
+
+    { key: 'group_performance', label: 'Performance & Health', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-amber/20' },
+    { key: 'jobRuns', label: 'Job Runs', isGroupSeparator: false },
     { key: 'errorRate', label: 'Error Rate', isGroupSeparator: false },
     { key: 'avgLatency', label: 'Avg Transfer Latency', isGroupSeparator: false },
-    { key: 'colorTag', label: 'Health Status', isGroupSeparator: true },
+    { key: 'colorTag', label: 'Health Status', isGroupSeparator: false },
 ];
 
 export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
