@@ -34,9 +34,9 @@ const FileApplicationConsole: React.FC = () => {
   const [subscriberSearch, setSubscriberSearch] = useState('');
     
   const kpis = getFileAppKpis(selectedSubscribers, selectedZones, selectedTimeRange);
-  const mftTrendData = getTrendData('MFT Trend', selectedSubscribers, selectedZones, selectedTimeRange);
+  const fileDownloadsTrendData = getTrendData('File Downloads Trend', selectedSubscribers, selectedZones, selectedTimeRange);
+  const fileUploadsTrendData = getTrendData('File Uploads Trend', selectedSubscribers, selectedZones, selectedTimeRange);
   const errorTrendData = getTrendData('Error Rate Trend', selectedSubscribers, selectedZones, selectedTimeRange);
-  const throughputTrendData = getTrendData('Throughput Trend', selectedSubscribers, selectedZones, selectedTimeRange);
   const failureReasons = getTopFailureReasons(selectedSubscribers, selectedZones);
   const logs = getLogs(selectedSubscribers, selectedZones);
   const subscriberMetrics = getSubscribersMetrics(selectedSubscribers, selectedZones);
@@ -85,7 +85,7 @@ const FileApplicationConsole: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* KPI Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi) => (
           <KpiCard key={kpi.id} data={kpi} />
         ))}
@@ -113,9 +113,9 @@ const FileApplicationConsole: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Trend Charts */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-             <TrendChart title="File Transfers Trend" data={mftTrendData} />
+             <TrendChart title="File Downloads Trend" data={fileDownloadsTrendData} />
+             <TrendChart title="File Uploads Trend" data={fileUploadsTrendData} />
              <TrendChart title="Error Rate Trend" data={errorTrendData} />
-             <TrendChart title="Throughput Trend" data={throughputTrendData} />
           </div>
           
           {/* Health & Failures */}

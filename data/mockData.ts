@@ -73,36 +73,54 @@ export const getFileAppKpis = (subscribers: Subscriber[] = [], zones: Zone[] = [
     
     const batchJobSummary = getBatchJobSummary(subscribers, zones, timeRange);
 
+    const isSingleSubscriber = subscribers.length === 1 && !isAll;
+    const numApps = isAll 
+        ? Object.keys(T_SHEET_FILE_APP_BASE_DATA).length
+        : isSingleSubscriber
+        ? 1
+        : subscribers.filter(s => T_SHEET_FILE_APP_BASE_DATA[s.name]).length;
+
+
     return [
+      {
+        id: 'num_file_apps',
+        title: 'Number of File applications',
+        value: numApps.toString(),
+        change: `+2 this month`,
+        changeType: 'increase',
+        sparkline: generateSparkline(12, 8),
+        status: 'green',
+        description: 'Total count of distinct applications configured for file transfers.',
+      },
       {
         id: 'files_processed',
         title: 'Number of Files Processed',
         value: formatNumber(batchJobSummary.filesProcessed),
         change: batchJobSummary.filesProcessedChange,
         changeType: 'increase',
-        sparkline: generateSparkline(12, 100000 * factor),
+        sparkline: generateSparkline(12, 100 * factor),
         status: 'green',
         description: 'Total number of files processed by file applications.',
       },
       {
         id: 'file_downloads',
         title: 'File Downloads',
-        value: `${(0.9 * factor * 30).toFixed(1)}M`,
-        change: `${isAll ? '+' : (Math.random() > 0.5 ? '+' : '-')}${(4.8 * filterFactor).toFixed(1)}%`,
+        value: formatNumber(900000 * factor),
+        change: `+4.8%`,
         changeType: 'increase',
-        sparkline: generateSparkline(12, 800 * factor),
+        sparkline: generateSparkline(12, 1 * factor),
         status: 'green',
-        description: 'Total number of successful file downloads in the selected period. This is a component of the North-Star Metric (NSM) for the File Application.',
+        description: 'Total number of successful file downloads in the selected period.',
       },
       {
         id: 'file_uploads',
         title: 'File Uploads',
-        value: `${(0.3 * factor * 30).toFixed(1)}M`,
-        change: `${isAll ? '+' : (Math.random() > 0.5 ? '+' : '-')}${(6.1 * filterFactor).toFixed(1)}%`,
+        value: formatNumber(300000 * factor),
+        change: `+6.1%`,
         changeType: 'increase',
-        sparkline: generateSparkline(12, 200 * factor),
+        sparkline: generateSparkline(12, 1 * factor),
         status: 'green',
-        description: 'Total number of successful file uploads in the selected period. This is a component of the North-Star Metric (NSM) for the File Application.',
+        description: 'Total number of successful file uploads in the selected period.',
       },
       {
         id: 'job_runs',
@@ -110,39 +128,29 @@ export const getFileAppKpis = (subscribers: Subscriber[] = [], zones: Zone[] = [
         value: formatNumber(batchJobSummary.jobsRun),
         change: batchJobSummary.jobsRunChange,
         changeType: 'increase',
-        sparkline: generateSparkline(12, 5000 * factor),
+        sparkline: generateSparkline(12, 500 * factor),
         status: 'green',
         description: 'Total number of batch jobs executed in the selected period. Primarily driven by the Perseus module.',
       },
       {
         id: 'error_rate',
         title: 'Error Rate',
-        value: `${(0.85 / filterFactor).toFixed(2)}%`,
-        change: `+${(15.0 * (1/filterFactor)).toFixed(1)}%`,
+        value: `0.85%`,
+        change: `+15.0%`,
         changeType: 'increase',
-        sparkline: generateSparkline(12, 10 * (1/filterFactor)),
-        status: filterFactor > 0.9 ? 'amber' : 'red',
+        sparkline: generateSparkline(12, 10),
+        status: 'amber',
         description: 'The percentage of file transfer operations that resulted in a failure (5xx error code). Spikes can indicate systemic issues.',
       },
       {
         id: 'avg_latency',
         title: 'Avg. Transfer Latency',
-        value: `${(1.2 * (1/filterFactor)).toFixed(1)}s`,
-        change: `+${(12.1 * (1/filterFactor)).toFixed(1)}%`,
+        value: `1.2s`,
+        change: `+12.1%`,
         changeType: 'increase',
-        sparkline: generateSparkline(12, 2000 * (1/filterFactor)),
-        status: filterFactor > 0.8 ? 'amber' : 'red',
+        sparkline: generateSparkline(12, 2000),
+        status: 'amber',
         description: 'The average time taken for a file transfer to complete, from initiation to final confirmation.',
-      },
-      {
-        id: 'health',
-        title: 'Health',
-        value: `${(99.98 - (1 - filterFactor) * 0.5).toFixed(2)}%`,
-        change: `-${(0.01 * filterFactor).toFixed(2)}%`,
-        changeType: 'decrease',
-        sparkline: generateSparkline(12, 100).map(d => ({ ...d, value: d.value > 10 ? 99.9 + Math.random() * 0.1 : 98 })),
-        status: filterFactor > 0.9 ? 'green' : 'amber',
-        description: 'The uptime percentage of all services backing the File Application over the selected time range. Target: 99.99%.',
       },
     ];
 }
@@ -353,7 +361,7 @@ export const getBatchJobSummary = (subscribers: Subscriber[] = [], zones: Zone[]
     const timeFactor = getTimeRangeFactor(timeRange);
     const factor = filterFactor * timeFactor;
 
-    const jobsRun = Math.round(15234 * factor);
+    const jobsRun = Math.round(508 * factor * 30); // Base value from screenshot
     const jobsFailed = Math.round(78 / (filterFactor || 0.1) * timeFactor); // Prevent division by zero, make failures more pronounced
     const jobsSucceeded = jobsRun > jobsFailed ? jobsRun - jobsFailed : 0;
     
@@ -363,11 +371,11 @@ export const getBatchJobSummary = (subscribers: Subscriber[] = [], zones: Zone[]
         recordsProcessed: Math.round(3456789 * factor),
         recordsProcessedChange: `+${(3.1 * filterFactor).toFixed(1)}%`,
         jobsSucceeded: jobsSucceeded,
-        jobsRunChange: `+${(2 * filterFactor).toFixed(1)}%`,
+        jobsRunChange: `+2.0%`,
         jobsFailedChange: `-${(5 * filterFactor).toFixed(1)}%`,
         jobsSucceededChange: `+${(2.2 * filterFactor).toFixed(1)}%`,
-        filesProcessed: Math.round(41700 * factor),
-        filesProcessedChange: `+${(5.8 * filterFactor).toFixed(1)}%`,
+        filesProcessed: Math.round(47 * factor * 30),
+        filesProcessedChange: `+5.8%`,
     }
 };
 
@@ -398,11 +406,10 @@ export const getDiaModuleMetrics = (subscribers: Subscriber[] = [], zones: Zone[
     const timeFactor = getTimeRangeFactor(timeRange);
     const factor = filterFactor * timeFactor;
     return [
-    { id: 'dia_downloads', name: 'File Downloads', value: `${(0.9 * factor * 30).toFixed(1)}M`, status: 'green', description: 'Total files downloaded by the DIA module.', change: `+${(4.8 * filterFactor).toFixed(1)}%` },
-    { id: 'dia_uploads', name: 'File Uploads', value: `${(0.3 * factor * 30).toFixed(1)}M`, status: 'green', description: 'Total files uploaded by the DIA module.', change: `+${(6.1 * filterFactor).toFixed(1)}%` },
-    { id: 'dia_health', name: 'Health', value: '99.98%', status: 'green', description: 'Uptime of the DIA module components.', change: '-0.01%' },
-    { id: 'dia_error_rate', name: 'Error Rate', value: '0.85%', status: 'amber', description: 'Percentage of failed transfers within the DIA module.', change: '+15.0%' },
-    { id: 'dia_latency', name: 'Avg Latency', value: `${(1.2 * (1/filterFactor)).toFixed(1)}s`, status: 'amber', description: 'Average file transfer latency for the DIA module.', change: `+${(12.1 * (1/filterFactor)).toFixed(1)}%` },
+        { id: 'dia_downloads', name: 'File Downloads', value: formatNumber(900000 * factor), status: 'green', description: 'Total files downloaded by the DIA module.', change: `+${(4.8 * filterFactor).toFixed(1)}%` },
+        { id: 'dia_uploads', name: 'File Uploads', value: formatNumber(300000 * factor), status: 'green', description: 'Total files uploaded by the DIA module.', change: `+${(6.1 * filterFactor).toFixed(1)}%` },
+        { id: 'dia_error_rate', name: 'Error Rate', value: '0.85%', status: 'amber', description: 'Percentage of failed transfers within the DIA module.', change: '+15.0%' },
+        { id: 'dia_latency', name: 'Avg Latency', value: `1.2s`, status: 'amber', description: 'Average file transfer latency for the DIA module.', change: `+12.1%` },
 ]};
 
 export const getPerseusDashboardKpis = (subscribers: Subscriber[] = [], zones: Zone[] = [], timeRange: TimeRange): KpiData[] => {
@@ -727,21 +734,22 @@ export const getMessageAppTSheetData = (selectedSubscribers: Subscriber[] = [], 
 // --- T-Sheet Data for File Application ---
 
 export const FILE_APP_TSHEET_METRICS: TSheetMetric[] = [
-    { key: 'fileDownloads', label: 'Total File Downloads', isGroupSeparator: false },
-    { key: 'fileUploads', label: 'Total File Uploads', isGroupSeparator: false },
+    { key: 'numFileApps', label: 'Number of File applications', isGroupSeparator: false },
+    { key: 'filesProcessed', label: 'No of files processed', isGroupSeparator: false },
+    { key: 'totalDownloads', label: 'Total File Downloads', isGroupSeparator: true },
+    { key: 'totalUploads', label: 'Total File Uploads', isGroupSeparator: false },
     { key: 'batchJobRuns', label: 'No of batch job runs', isGroupSeparator: true },
-    { key: 'filesProcessed', label: 'No of files processed by file applications', isGroupSeparator: false },
 ];
 
 const T_SHEET_FILE_APP_BASE_DATA: TSheetData = {
-    'Cardworks': { fileDownloads: '2.1 Mil', fileUploads: '350K', batchJobRuns: '15000', filesProcessed: '5500' },
-    'Sparrow': { fileDownloads: '500K', fileUploads: '50K', batchJobRuns: '2500', filesProcessed: '0' },
-    'HDFC': { fileDownloads: '1.2 Mil', fileUploads: '120K', batchJobRuns: '10000', filesProcessed: '50' },
-    'Optum': { fileDownloads: '3.5 Mil', fileUploads: '600K', batchJobRuns: '12000', filesProcessed: '3000' },
-    'Jenius Bank': { fileDownloads: '800K', fileUploads: '90K', batchJobRuns: '5000', filesProcessed: '500' },
-    'Lakestack': { fileDownloads: '650K', fileUploads: '70K', batchJobRuns: '4000', filesProcessed: '100' },
-    'ITP': { fileDownloads: '1.8 Mil', fileUploads: '200K', batchJobRuns: '8000', filesProcessed: '1000' },
-    'Tachyon Credit': { fileDownloads: '400K', fileUploads: '30K', batchJobRuns: '3000', filesProcessed: '0' }
+    'Cardworks': { batchJobRuns: '15K', filesProcessed: '5.5K', numFileApps: '2', totalDownloads: '279k', totalUploads: '8k' },
+    'Sparrow': { batchJobRuns: '2.5K', filesProcessed: '0', numFileApps: '1', totalDownloads: '53k', totalUploads: '10k' },
+    'HDFC': { batchJobRuns: '10K', filesProcessed: '50', numFileApps: '1', totalDownloads: '60k', totalUploads: '4k' },
+    'Optum': { batchJobRuns: '12K', filesProcessed: '3K', numFileApps: '3', totalDownloads: '22k', totalUploads: '260' },
+    'Jenius Bank': { batchJobRuns: '5K', filesProcessed: '500', numFileApps: '1', totalDownloads: '30k', totalUploads: '200' },
+    'Lakestack': { batchJobRuns: '4K', filesProcessed: '100', numFileApps: '1', totalDownloads: '45k', totalUploads: '3k' },
+    'ITP': { batchJobRuns: '8K', filesProcessed: '1K', numFileApps: '2', totalDownloads: '150k', totalUploads: '5k' },
+    'Tachyon Credit': { batchJobRuns: '3K', filesProcessed: '0', numFileApps: '1', totalDownloads: '80k', totalUploads: '9k' }
 };
 
 export const getFileAppTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; subscribers: string[] } => {
@@ -843,15 +851,15 @@ export const getDiaNorthStarKpis = (subscribers: Subscriber[] = [], zones: Zone[
     {
       id: 'file_downloads_nsm',
       title: 'File Downloads',
-      value: (985400 * filterFactor).toLocaleString('en-US', { maximumFractionDigits: 0 }),
-      change: `+${(2.1 * filterFactor).toFixed(1)}% vs last month`,
+      value: (915400 * filterFactor).toLocaleString('en-US', { maximumFractionDigits: 0 }),
+      change: `+${(2.2 * filterFactor).toFixed(1)}% vs last month`,
       changeType: 'increase',
     },
     {
       id: 'file_uploads_nsm',
       title: 'File Uploads',
-      value: (230000 * filterFactor).toLocaleString('en-US', { maximumFractionDigits: 0 }),
-      change: `+${(3.2 * filterFactor).toFixed(1)}% vs last month`,
+      value: (300000 * filterFactor).toLocaleString('en-US', { maximumFractionDigits: 0 }),
+      change: `+${(3.1 * filterFactor).toFixed(1)}% vs last month`,
       changeType: 'increase',
     },
     {

@@ -35,7 +35,8 @@ const TenantDetailView: React.FC<TenantDetailViewProps> = ({ onBack }) => {
     // Fetch data for the specific tenant
     const fileKpis = getFileAppKpis(subscriberFilter, [], selectedTimeRange);
     const msgKpis = getMessageAppKpis(subscriberFilter, [], selectedTimeRange);
-    const mftTrendData = getTrendData('MFT Trend', subscriberFilter, [], selectedTimeRange);
+    const fileDownloadsTrendData = getTrendData('File Downloads Trend', subscriberFilter, [], selectedTimeRange);
+    const fileUploadsTrendData = getTrendData('File Uploads Trend', subscriberFilter, [], selectedTimeRange);
     const eventsTrendData = getTrendData('Events Published Trend', subscriberFilter, [], selectedTimeRange);
     const logs = getLogs(subscriberFilter);
     const recentFailedJobs = getJobRuns(subscriberFilter, [], 'failed');
@@ -64,8 +65,9 @@ const TenantDetailView: React.FC<TenantDetailViewProps> = ({ onBack }) => {
             </div>
 
             <h3 className="text-lg font-semibold text-white pt-4">Trends</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <TrendChart title="File Transfers Trend" data={mftTrendData} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <TrendChart title="File Downloads Trend" data={fileDownloadsTrendData} />
+                <TrendChart title="File Uploads Trend" data={fileUploadsTrendData} />
                 <TrendChart title="Events Published Trend" data={eventsTrendData} />
             </div>
 
