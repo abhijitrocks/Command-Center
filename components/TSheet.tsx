@@ -11,6 +11,12 @@ interface TSheetProps {
 }
 
 const TSheet: React.FC<TSheetProps> = ({ title, header, metrics, data, subscribers, onMetricClick }) => {
+  const colorMap: { [key: string]: string } = {
+    Amber: 'bg-status-amber',
+    Green: 'bg-status-green',
+    Red: 'bg-status-red',
+  };
+
   return (
     <div className="bg-gray-800 p-4 rounded-lg">
       <h3 className="text-md font-semibold text-white mb-4">{title}</h3>
@@ -51,11 +57,23 @@ const TSheet: React.FC<TSheetProps> = ({ title, header, metrics, data, subscribe
                 <td className="p-2 font-semibold text-gray-300 group-hover:text-brand-blue transition-colors">
                   {metric.label}
                 </td>
-                {subscribers.map((subName) => (
-                  <td key={`${metric.key}-${subName}`} className="p-2 text-gray-300 text-center border-l border-gray-700">
-                    {data[subName]?.[metric.key] ?? 'N/A'}
-                  </td>
-                ))}
+                {subscribers.map((subName) => {
+                  const cellValue = data[subName]?.[metric.key];
+                  return (
+                    <td key={`${metric.key}-${subName}`} className="p-2 text-gray-300 text-center border-l border-gray-700">
+                      {metric.key === 'colorTag' && cellValue ? (
+                        <div className="flex justify-center items-center">
+                          <span
+                            className={`h-4 w-4 rounded-full ${colorMap[cellValue] || 'bg-gray-600'}`}
+                            title={cellValue}
+                          ></span>
+                        </div>
+                      ) : (
+                        cellValue ?? 'N/A'
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

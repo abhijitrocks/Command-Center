@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import TrendChart, { HistogramChart } from '../components/charts/TrendChart';
-import { getFileAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getBatchJobSummary, getLatencyDistributionData, getTracesData, getDiaModuleMetrics, getPerseusModuleMetrics, getFileAppTSheetData } from '../data/mockData';
+import { getFileAppKpis, getTrendData, getTopFailureReasons, getLogs, getSubscribersMetrics, getBatchJobSummary, getLatencyDistributionData, getTracesData, getDiaModuleMetrics, getPerseusModuleMetrics, getFileAppTimeBasedTSheetData } from '../data/mockData';
 import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ArrowUpRightIcon } from '../components/icons';
 import { FailureReason, TSheetMetric, View } from '../types';
 import ModuleStatusCard from '../components/ModuleStatusCard';
@@ -45,7 +45,7 @@ const FileApplicationConsole: React.FC = () => {
   const traces = getTracesData(selectedSubscribers, selectedZones);
   const diaMetrics = getDiaModuleMetrics(selectedSubscribers, selectedZones, selectedTimeRange);
   const perseusMetrics = getPerseusModuleMetrics(selectedSubscribers, selectedZones, selectedTimeRange);
-  const { metrics: tsheetMetrics, data: tsheetData, subscribers: tsheetSubscribers } = getFileAppTSheetData(selectedSubscribers, selectedZones);
+  const { metrics: tsheetMetrics, data: tsheetData, timeRanges: tsheetColumns } = getFileAppTimeBasedTSheetData(selectedSubscribers, selectedZones);
 
   const displayedLogs = logs.filter(log => {
     const logDate = new Date(log.timestamp);
@@ -103,7 +103,7 @@ const FileApplicationConsole: React.FC = () => {
         header="Metric"
         metrics={tsheetMetrics}
         data={tsheetData}
-        subscribers={tsheetSubscribers}
+        subscribers={tsheetColumns}
         onMetricClick={handleTSheetMetricClick}
       />
 

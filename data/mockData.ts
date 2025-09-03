@@ -1,3 +1,4 @@
+
 import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
@@ -64,6 +65,7 @@ const getTimeRangeFactor = (timeRange: TimeRange): number => {
     }
 };
 
+const SUBSCRIBERS_WITH_FILE_APPS = ['Cardworks', 'Sparrow', 'HDFC', 'Optum', 'Jenius Bank', 'Lakestack', 'ITP', 'Tachyon Credit'];
 
 export const getFileAppKpis = (subscribers: Subscriber[] = [], zones: Zone[] = [], timeRange: TimeRange): KpiData[] => {
     const filterFactor = getFilterFactor(subscribers, zones);
@@ -75,10 +77,10 @@ export const getFileAppKpis = (subscribers: Subscriber[] = [], zones: Zone[] = [
 
     const isSingleSubscriber = subscribers.length === 1 && !isAll;
     const numApps = isAll 
-        ? Object.keys(T_SHEET_FILE_APP_BASE_DATA).length
+        ? SUBSCRIBERS_WITH_FILE_APPS.length
         : isSingleSubscriber
         ? 1
-        : subscribers.filter(s => T_SHEET_FILE_APP_BASE_DATA[s.name]).length;
+        : subscribers.filter(s => SUBSCRIBERS_WITH_FILE_APPS.includes(s.name)).length;
 
 
     return [
@@ -733,55 +735,33 @@ export const getMessageAppTSheetData = (selectedSubscribers: Subscriber[] = [], 
 
 // --- T-Sheet Data for File Application ---
 
-export const FILE_APP_TSHEET_METRICS: TSheetMetric[] = [
+export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
     { key: 'numFileApps', label: 'Number of File applications', isGroupSeparator: false },
     { key: 'filesProcessed', label: 'No of files processed', isGroupSeparator: false },
-    { key: 'totalDownloads', label: 'Total File Downloads', isGroupSeparator: true },
+    { key: 'totalDownloads', label: 'Total File Downloads', isGroupSeparator: false },
     { key: 'totalUploads', label: 'Total File Uploads', isGroupSeparator: false },
-    { key: 'batchJobRuns', label: 'No of batch job runs', isGroupSeparator: true },
+    { key: 'jobRuns', label: 'Job Runs', isGroupSeparator: true },
+    { key: 'errorRate', label: 'Error Rate', isGroupSeparator: false },
+    { key: 'avgLatency', label: 'Avg Transfer Latency', isGroupSeparator: false },
+    { key: 'colorTag', label: 'Health Status', isGroupSeparator: true },
 ];
 
-const T_SHEET_FILE_APP_BASE_DATA: TSheetData = {
-    'Cardworks': { batchJobRuns: '15K', filesProcessed: '5.5K', numFileApps: '2', totalDownloads: '279k', totalUploads: '8k' },
-    'Sparrow': { batchJobRuns: '2.5K', filesProcessed: '0', numFileApps: '1', totalDownloads: '53k', totalUploads: '10k' },
-    'HDFC': { batchJobRuns: '10K', filesProcessed: '50', numFileApps: '1', totalDownloads: '60k', totalUploads: '4k' },
-    'Optum': { batchJobRuns: '12K', filesProcessed: '3K', numFileApps: '3', totalDownloads: '22k', totalUploads: '260' },
-    'Jenius Bank': { batchJobRuns: '5K', filesProcessed: '500', numFileApps: '1', totalDownloads: '30k', totalUploads: '200' },
-    'Lakestack': { batchJobRuns: '4K', filesProcessed: '100', numFileApps: '1', totalDownloads: '45k', totalUploads: '3k' },
-    'ITP': { batchJobRuns: '8K', filesProcessed: '1K', numFileApps: '2', totalDownloads: '150k', totalUploads: '5k' },
-    'Tachyon Credit': { batchJobRuns: '3K', filesProcessed: '0', numFileApps: '1', totalDownloads: '80k', totalUploads: '9k' }
+const timeBasedTSheetData: TSheetData = {
+    'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%', avgLatency: '1.5 s', colorTag: 'Amber' },
+    'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%', avgLatency: '1.4 s', colorTag: 'Amber' },
+    'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%', avgLatency: '1.3 s', colorTag: 'Green' },
+    'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%', avgLatency: '1.2 s', colorTag: 'Green' },
 };
 
-export const getFileAppTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; subscribers: string[] } => {
-    const baseData = T_SHEET_FILE_APP_BASE_DATA;
-    const allTSheetSubscriberNames = Object.keys(baseData);
-    let subscribersToShow: string[] = [];
+const timeRangesForTSheet = ['Last 7 days', 'Last 30 days', 'Last 24 h', 'Last 1 hour'];
 
-    const isAllSubscribersSelected = !selectedSubscribers || selectedSubscribers.length === 0 || selectedSubscribers.some(s => s.id === 'all');
-    const isAllZonesSelected = !selectedZones || selectedZones.length === 0 || selectedZones.some(z => z.id === 'all');
-
-    if (isAllSubscribersSelected) {
-        if (isAllZonesSelected) {
-            subscribersToShow = allTSheetSubscriberNames;
-        } else {
-            const selectedZoneIds = selectedZones.map(z => z.id);
-            const subscribersInZone = SUBSCRIBERS
-                .filter(s => s.id !== 'all' && selectedZoneIds.includes(s.zoneId))
-                .map(s => s.name);
-            subscribersToShow = allTSheetSubscriberNames.filter(name => subscribersInZone.includes(name));
-        }
-    } else {
-        subscribersToShow = selectedSubscribers.map(s => s.name).filter(name => allTSheetSubscriberNames.includes(name));
-    }
-
-    const filteredData = Object.fromEntries(
-        Object.entries(baseData).filter(([subscriberName]) => subscribersToShow.includes(subscriberName))
-    );
-    
+export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
+    // Note: The data is currently static as per the screenshot. 
+    // In a real implementation, this would be calculated based on filters.
     return {
-        metrics: FILE_APP_TSHEET_METRICS,
-        data: filteredData,
-        subscribers: subscribersToShow,
+        metrics: FILE_APP_TIME_BASED_TSHEET_METRICS,
+        data: timeBasedTSheetData,
+        timeRanges: timeRangesForTSheet,
     };
 };
 
