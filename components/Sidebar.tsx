@@ -49,19 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedWorkbench, onSelectWorkbench,
         <h1 className="text-xl font-bold text-white">Command Center</h1>
       </div>
       
-      {/* Project selector / Header */}
-      <div className="border-t border-b border-gray-700 py-3 px-2 flex items-center space-x-3 flex-shrink-0">
-          <div className="w-10 h-10 bg-brand-purple rounded-md flex items-center justify-center font-bold text-lg">
-              T
-          </div>
-          <div>
-              <p className="font-semibold text-white">TEST@ABI</p>
-              <p className="text-xs text-gray-400">Service Project</p>
-          </div>
-      </div>
-      
       {/* Main navigation */}
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+      <div className="flex-1 overflow-y-auto pr-2 -mr-2 pt-4 border-t border-gray-700">
         <nav className="space-y-1">
             <NavHeader label="Queues" />
             <NavItem id="tasks-all" label="All open" icon={<QueueListIcon />} activeItem={activeItem} onSelect={onSelectItem} count={12} />
