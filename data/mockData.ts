@@ -664,8 +664,8 @@ export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
     { key: 'group_apps', label: 'File Applications & Transfers', isGroupHeader: true, isGroupSeparator: false, color: 'bg-brand-blue/20' },
     { key: 'numFileApps', label: 'Number of File Applications Created', isGroupSeparator: false },
     { key: 'filesProcessed', label: 'No of files processed', isGroupSeparator: false },
-    { key: 'totalDownloads', label: 'Total File Downloads', isGroupSeparator: false },
     { key: 'totalUploads', label: 'Total File Uploads', isGroupSeparator: false },
+    { key: 'totalDownloads', label: 'Total File Downloads', isGroupSeparator: false },
 
     { key: 'group_performance', label: 'Performance & Health', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-amber/20' },
     { key: 'jobRuns', label: 'Job Runs', isGroupSeparator: false },
