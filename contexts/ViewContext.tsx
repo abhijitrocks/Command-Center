@@ -5,11 +5,12 @@ export interface ViewState {
     currentView: View;
     initialAlertConfig?: { metricId: string };
     selectedTenantId?: string;
+    selectedTaskId?: string;
 }
 
 interface ViewContextType {
   viewState: ViewState;
-  setView: (view: View, context?: { metricId?: string; tenantId?: string }) => void;
+  setView: (view: View, context?: { metricId?: string; tenantId?: string, taskId?: string }) => void;
 }
 
 const ViewContext = createContext<ViewContextType | undefined>(undefined);
@@ -17,11 +18,12 @@ const ViewContext = createContext<ViewContextType | undefined>(undefined);
 export const ViewProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [viewState, setViewState] = useState<ViewState>({ currentView: View.CONSOLE });
 
-  const setView = (view: View, context?: { metricId?: string; tenantId?: string }) => {
+  const setView = (view: View, context?: { metricId?: string; tenantId?: string, taskId?: string }) => {
     setViewState({
         currentView: view,
         initialAlertConfig: context?.metricId ? { metricId: context.metricId } : undefined,
-        selectedTenantId: context?.tenantId
+        selectedTenantId: context?.tenantId,
+        selectedTaskId: context?.taskId
     });
   };
 

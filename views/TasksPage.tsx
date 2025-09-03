@@ -1,10 +1,14 @@
-
 import React, { useState } from 'react';
 import { getTasks } from '../data/mockData';
 import { Task } from '../types';
 import { ChevronDownIcon, UserIcon, ArrowUpIcon, DocumentDuplicateIcon } from '../components/icons';
 
-const TasksPage: React.FC<{ queueId: string }> = ({ queueId }) => {
+interface TasksPageProps {
+    queueId: string;
+    onTaskSelect: (taskId: string) => void;
+}
+
+const TasksPage: React.FC<TasksPageProps> = ({ queueId, onTaskSelect }) => {
     const [tasks, setTasks] = useState<Task[]>(getTasks());
     const [sortAsc, setSortAsc] = useState(true);
 
@@ -69,9 +73,11 @@ const TasksPage: React.FC<{ queueId: string }> = ({ queueId }) => {
                             <tr key={task.key} className="hover:bg-gray-800/50">
                                 <td className="p-3"><input type="checkbox" className="bg-gray-900 border-gray-600 rounded" /></td>
                                 <td className="p-3 text-gray-400">{task.key}</td>
-                                <td className="p-3 text-brand-blue hover:underline cursor-pointer flex items-center space-x-2">
-                                    <DocumentDuplicateIcon className="h-4 w-4 text-gray-400" />
-                                    <span>{task.summary}</span>
+                                <td className="p-3">
+                                    <button onClick={() => onTaskSelect(task.key)} className="text-brand-blue hover:underline flex items-center space-x-2 text-left">
+                                        <DocumentDuplicateIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                        <span>{task.summary}</span>
+                                    </button>
                                 </td>
                                 <td className="p-3">{task.reporter}</td>
                                 <td className="p-3">
@@ -85,7 +91,7 @@ const TasksPage: React.FC<{ queueId: string }> = ({ queueId }) => {
                                         {task.status} <ChevronDownIcon className="h-4 w-4 ml-1" />
                                     </span>
                                 </td>
-                                <td className="p-3">{task.created}</td>
+                                <td className="p-3">{task.created.startsWith('Created') ? '03/Sep/25' : task.created}</td>
                                 <td className="p-3">{task.due}</td>
                             </tr>
                         ))}

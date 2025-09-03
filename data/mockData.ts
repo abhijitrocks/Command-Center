@@ -902,9 +902,13 @@ export const getSubscriptionMetrics = (subscriptionId: string, subscribers: Subs
 
 export const getTasks = (): Task[] => {
     return [
-        { key: 'ABHI-1', summary: 'test', reporter: 'Abhijit Kumar Bhowmick', assignee: 'Unassigned', status: 'OPEN', created: '03/Sep/25', due: '10/Sep/25' },
-        { key: 'TASK-123', summary: 'Fix login button alignment', reporter: 'Jane Doe', assignee: 'John Smith', status: 'IN_PROGRESS', created: '01/Sep/25', due: '05/Sep/25' },
-        { key: 'TASK-122', summary: 'Deploy new feature to production', reporter: 'Admin', assignee: 'Jane Doe', status: 'OPEN', created: '30/Aug/25', due: '08/Sep/25' },
-        { key: 'TASK-121', summary: 'Update documentation for API v2', reporter: 'John Smith', assignee: 'Unassigned', status: 'DONE', created: '25/Aug/25', due: '30/Aug/25' },
+        { key: 'ABHI-1', summary: 'test', reporter: 'Abhijit Kumar Bhowmick', assignee: 'Unassigned', status: 'OPEN', created: 'Created 42 minutes ago', due: '10/Sep/25', updated: 'Updated 42 minutes ago', description: '', requestType: 'None', priority: 'Medium' },
+        { key: 'TASK-123', summary: 'Fix login button alignment', reporter: 'Jane Doe', assignee: 'John Smith', status: 'IN_PROGRESS', created: '01/Sep/25', due: '05/Sep/25', updated: '02/Sep/25', description: 'The login button is misaligned on Safari.', requestType: 'Bug', priority: 'High' },
+        { key: 'TASK-122', summary: 'Deploy new feature to production', reporter: 'Admin', assignee: 'Jane Doe', status: 'OPEN', created: '30/Aug/25', due: '08/Sep/25', updated: '30/Aug/25', description: 'Deploy the new user dashboard feature.', requestType: 'Task', priority: 'Medium' },
+        { key: 'TASK-121', summary: 'Update documentation for API v2', reporter: 'John Smith', assignee: 'Unassigned', status: 'DONE', created: '25/Aug/25', due: '30/Aug/25', updated: '28/Aug/25', description: 'API v2 documentation needs to be updated with new endpoints.', requestType: 'Story', priority: 'Low' },
     ];
+};
+
+export const getTaskById = (key: string): Task | undefined => {
+    return getTasks().find(task => task.key === key);
 };

@@ -139,6 +139,7 @@ export enum View {
     ATROPOS = 'ATROPOS',
     ALERTS = 'ALERTS',
     TENANT_DETAIL = 'TENANT_DETAIL',
+    TASK_DETAIL = 'TASK_DETAIL',
 }
 
 export interface AlertableMetric {
@@ -299,4 +300,8 @@ export interface Task {
     status: string;
     created: string;
     due: string;
+    description: string;
+    requestType: string;
+    priority: 'Medium' | 'High' | 'Low';
+    updated: string;
 }
