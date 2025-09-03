@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { OlympusIcon, QueueListIcon, ComputerDesktopIcon, EllipsisHorizontalIcon } from './icons';
 import { useAlerts } from '../contexts/AlertsContext';
@@ -72,8 +71,8 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedWorkbench, onSelectWorkbench,
 
         <nav className="space-y-1">
             <NavHeader label="Consoles" />
-            <NavItem id="console-file" label="File Application" icon={<ComputerDesktopIcon />} activeItem={activeItem} onSelect={onSelectItem} />
-            <NavItem id="console-message" label="Message Application" icon={<ComputerDesktopIcon />} activeItem={activeItem} onSelect={onSelectItem} />
+            <NavItem id="console-file" label="File Application Win Dashboard" icon={<ComputerDesktopIcon />} activeItem={activeItem} onSelect={onSelectItem} />
+            <NavItem id="console-message" label="Message Application Win Dashboard" icon={<ComputerDesktopIcon />} activeItem={activeItem} onSelect={onSelectItem} />
         </nav>
       </div>
 

@@ -1,4 +1,3 @@
-
 import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription, Task } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
@@ -143,16 +142,6 @@ export const getFileAppKpis = (subscribers: Subscriber[] = [], zones: Zone[] = [
         sparkline: generateSparkline(12, 10),
         status: 'amber',
         description: 'The percentage of file transfer operations that resulted in a failure (5xx error code). Spikes can indicate systemic issues.',
-      },
-      {
-        id: 'avg_latency',
-        title: 'Avg. Transfer Latency',
-        value: `1.2s`,
-        change: `+12.1%`,
-        changeType: 'increase',
-        sparkline: generateSparkline(12, 2000),
-        status: 'amber',
-        description: 'The average time taken for a file transfer to complete, from initiation to final confirmation.',
       },
     ];
 }
@@ -541,7 +530,6 @@ export const getAlertableMetrics = (): AlertableMetric[] => [
     { id: 'file_uploads', name: 'File App: File Uploads', unit: 'count' },
     { id: 'health', name: 'File App: Health', unit: 'percent' },
     { id: 'error_rate', name: 'File App: Error Rate', unit: 'percent' },
-    { id: 'avg_latency', name: 'File App: Avg Latency', unit: 'seconds' },
     { id: 'throughput', name: 'File App: Throughput', unit: 'mbs' },
     { id: 'events_published', name: 'Message App: Events Published', unit: 'count' },
     { id: 'health_msg', name: 'Message App: Health', unit: 'percent' },
@@ -671,7 +659,6 @@ export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
     { key: 'group_performance', label: 'Performance & Health', isGroupHeader: true, isGroupSeparator: true, color: 'bg-status-amber/20' },
     { key: 'jobRuns', label: 'Job Runs', isGroupSeparator: false },
     { key: 'errorRate', label: 'Error Rate', isGroupSeparator: false },
-    { key: 'avgLatency', label: 'Avg Transfer Latency', isGroupSeparator: false },
 ];
 
 export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
@@ -679,11 +666,11 @@ export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] 
     const tillDateHeader = `Till Date (${today})`;
     
     const timeBasedTSheetData: TSheetData = {
-        'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%', avgLatency: '1.2 s' },
-        'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%', avgLatency: '1.3 s' },
-        'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%', avgLatency: '1.5 s' },
-        'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%', avgLatency: '1.4 s' },
-        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%', avgLatency: '1.4 s' }
+        'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%' },
+        'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%' },
+        'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%' },
+        'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%' },
+        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%' }
     };
     
     const timeRangesForTSheet = ['Last 1 hour', 'Last 24 h', 'Last 7 days', 'Last 30 days', tillDateHeader];

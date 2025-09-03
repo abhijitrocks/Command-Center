@@ -1,4 +1,3 @@
-
 export enum ConsoleTab {
   FILE_APP = 'File Application Win Dashboard',
   MESSAGE_APP = 'Message Application Win Dashboard',
@@ -187,16 +186,17 @@ export interface JobRun {
 export interface TSheetMetric {
   key: string;
   label: string;
-  isGroupSeparator: boolean; // To add top padding/border for visual grouping
   isGroupHeader?: boolean;
+  isGroupSeparator: boolean;
   color?: string;
 }
 
 export interface TSheetData {
-  [subscriberName: string]: {
-    [metricKey: string]: string; // Values are strings like '1547', '18 Mil', 'NA'
+  [columnName: string]: {
+    [metricKey: string]: string;
   };
 }
+
 
 export interface FeatureAdoption {
     name: string;
@@ -292,11 +292,11 @@ export interface SubscriptionMetrics {
 }
 
 export interface Task {
-  key: string;
-  summary: string;
-  reporter: string;
-  assignee: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'DONE';
-  created: string;
-  due: string;
+    key: string;
+    summary: string;
+    reporter: string;
+    assignee: string;
+    status: string;
+    created: string;
+    due: string;
 }
