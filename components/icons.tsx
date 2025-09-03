@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const createIcon = (path: React.ReactNode) => (props: React.SVGProps<SVGSVGElement>) => (
@@ -90,4 +91,24 @@ export const ArrowUpIcon = createIcon(
 
 export const ArrowDownIcon = createIcon(
     <path fillRule="evenodd" d="M10 15a.75.75 0 01-.53-.22l-3.25-3.25a.75.75 0 011.06-1.06L10 13.19l2.72-2.72a.75.75 0 111.06 1.06l-3.25 3.25A.75.75 0 0110 15z" clipRule="evenodd" />
+);
+
+export const QueueListIcon = createIcon(
+  <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+);
+
+export const ComputerDesktopIcon = createIcon(
+  <path d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h5l-.621-.621A3 3 0 0111 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h9.5A2.25 2.25 0 0115 5.25z" />
+);
+
+export const EllipsisHorizontalIcon = createIcon(
+  <path fillRule="evenodd" d="M10 5.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm5 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm-10 1.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+);
+
+export const UserIcon = createIcon(
+  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+);
+
+export const DocumentDuplicateIcon = createIcon(
+    <path fillRule="evenodd" d="M15.5 2.75a.75.75 0 01.75.75v12a.75.75 0 01-1.5 0V4.26L12.76 6.24a.75.75 0 01-1.02-1.1l3-4a.75.75 0 011.01-.01zM4.5 3.5A1.5 1.5 0 003 5v10A1.5 1.5 0 004.5 16.5h8A1.5 1.5 0 0014 15V5a1.5 1.5 0 00-1.5-1.5h-8z" clipRule="evenodd" />
 );

@@ -1,4 +1,4 @@
-// FIX: import useEffect to handle prop changes
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import FileApplicationConsole from './FileApplicationConsole';
@@ -11,22 +11,20 @@ import { ConsoleTab, View } from '../types';
 import { useView } from '../contexts/ViewContext';
 import TenantDetailView from './TenantDetailView';
 
-// FIX: Define props for the WorkbenchPage component to accept 'activeConsole'.
 interface WorkbenchPageProps {
   activeConsole: 'file' | 'message';
 }
 
 const WorkbenchPage: React.FC<WorkbenchPageProps> = ({ activeConsole }) => {
-  // FIX: Initialize activeTab state based on the 'activeConsole' prop.
   const [activeTab, setActiveTab] = useState<ConsoleTab>(
     activeConsole === 'message' ? ConsoleTab.MESSAGE_APP : ConsoleTab.FILE_APP
   );
-  const { viewState, setView } = useView();
 
-  // FIX: Add useEffect to update the active tab when the 'activeConsole' prop changes.
   useEffect(() => {
     setActiveTab(activeConsole === 'message' ? ConsoleTab.MESSAGE_APP : ConsoleTab.FILE_APP);
   }, [activeConsole]);
+
+  const { viewState, setView } = useView();
 
   const handleBackToConsole = () => {
     setView(View.CONSOLE);

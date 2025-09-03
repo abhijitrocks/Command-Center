@@ -1,4 +1,5 @@
-import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription } from '../types';
+
+import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription, Task } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
 const generateSparkline = (length = 12, max = 100) => {
@@ -671,7 +672,6 @@ export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
     { key: 'jobRuns', label: 'Job Runs', isGroupSeparator: false },
     { key: 'errorRate', label: 'Error Rate', isGroupSeparator: false },
     { key: 'avgLatency', label: 'Avg Transfer Latency', isGroupSeparator: false },
-    { key: 'colorTag', label: 'Health Status', isGroupSeparator: false },
 ];
 
 export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
@@ -679,11 +679,11 @@ export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] 
     const tillDateHeader = `Till Date (${today})`;
     
     const timeBasedTSheetData: TSheetData = {
-        'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%', avgLatency: '1.2 s', colorTag: 'Green' },
-        'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%', avgLatency: '1.3 s', colorTag: 'Green' },
-        'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%', avgLatency: '1.5 s', colorTag: 'Amber' },
-        'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%', avgLatency: '1.4 s', colorTag: 'Amber' },
-        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%', avgLatency: '1.4 s', colorTag: 'Amber' }
+        'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%', avgLatency: '1.2 s' },
+        'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%', avgLatency: '1.3 s' },
+        'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%', avgLatency: '1.5 s' },
+        'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%', avgLatency: '1.4 s' },
+        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%', avgLatency: '1.4 s' }
     };
     
     const timeRangesForTSheet = ['Last 1 hour', 'Last 24 h', 'Last 7 days', 'Last 30 days', tillDateHeader];
@@ -911,4 +911,13 @@ export const getSubscriptionMetrics = (subscriptionId: string, subscribers: Subs
             successEvents: { name: 'Success Events', value: (5000 * (0.8 + seededRandom() * 0.4) * factor).toLocaleString('en-US', { maximumFractionDigits: 0 }), status: 'green' },
         }
     }
+};
+
+export const getTasks = (): Task[] => {
+    return [
+        { key: 'ABHI-1', summary: 'test', reporter: 'Abhijit Kumar Bhowmick', assignee: 'Unassigned', status: 'OPEN', created: '03/Sep/25', due: '10/Sep/25' },
+        { key: 'TASK-123', summary: 'Fix login button alignment', reporter: 'Jane Doe', assignee: 'John Smith', status: 'IN_PROGRESS', created: '01/Sep/25', due: '05/Sep/25' },
+        { key: 'TASK-122', summary: 'Deploy new feature to production', reporter: 'Admin', assignee: 'Jane Doe', status: 'OPEN', created: '30/Aug/25', due: '08/Sep/25' },
+        { key: 'TASK-121', summary: 'Update documentation for API v2', reporter: 'John Smith', assignee: 'Unassigned', status: 'DONE', created: '25/Aug/25', due: '30/Aug/25' },
+    ];
 };

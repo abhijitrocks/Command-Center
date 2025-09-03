@@ -1,6 +1,7 @@
+
 export enum ConsoleTab {
-  FILE_APP = 'File Application',
-  MESSAGE_APP = 'Message Application',
+  FILE_APP = 'File Application Win Dashboard',
+  MESSAGE_APP = 'Message Application Win Dashboard',
 }
 
 export enum TimeRange {
@@ -288,4 +289,14 @@ export interface SubscriptionMetrics {
         droppedEvents: SloMetric;
         successEvents: SloMetric;
     }
+}
+
+export interface Task {
+  key: string;
+  summary: string;
+  reporter: string;
+  assignee: string;
+  status: 'OPEN' | 'IN_PROGRESS' | 'DONE';
+  created: string;
+  due: string;
 }
