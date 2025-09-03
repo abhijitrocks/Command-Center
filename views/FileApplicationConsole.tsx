@@ -84,6 +84,16 @@ const FileApplicationConsole: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* T-Sheet Metrics */}
+      <TSheet
+        title="File Application Metrics (T-Sheet)"
+        header="Metric"
+        metrics={tsheetMetrics}
+        data={tsheetData}
+        subscribers={tsheetColumns}
+        onMetricClick={handleTSheetMetricClick}
+      />
+      
       {/* KPI Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi) => (
@@ -96,17 +106,6 @@ const FileApplicationConsole: React.FC = () => {
           <ModuleStatusCard title="DIA Module Status" metrics={diaMetrics} onExpand={() => setView(View.DIA)} />
           <ModuleStatusCard title="Perseus Module Status" metrics={perseusMetrics} onExpand={() => setView(View.PERSEUS)} />
       </div>
-
-      {/* T-Sheet Metrics */}
-      <TSheet
-        title="File Application Metrics (T-Sheet)"
-        header="Metric"
-        metrics={tsheetMetrics}
-        data={tsheetData}
-        subscribers={tsheetColumns}
-        onMetricClick={handleTSheetMetricClick}
-      />
-
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

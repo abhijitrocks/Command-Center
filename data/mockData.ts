@@ -1,4 +1,3 @@
-
 import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
@@ -746,18 +745,20 @@ export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
     { key: 'colorTag', label: 'Health Status', isGroupSeparator: true },
 ];
 
-const timeBasedTSheetData: TSheetData = {
-    'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%', avgLatency: '1.5 s', colorTag: 'Amber' },
-    'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%', avgLatency: '1.4 s', colorTag: 'Amber' },
-    'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%', avgLatency: '1.3 s', colorTag: 'Green' },
-    'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%', avgLatency: '1.2 s', colorTag: 'Green' },
-};
-
-const timeRangesForTSheet = ['Last 7 days', 'Last 30 days', 'Last 24 h', 'Last 1 hour'];
-
 export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
-    // Note: The data is currently static as per the screenshot. 
-    // In a real implementation, this would be calculated based on filters.
+    const today = new Date().toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
+    const tillDateHeader = `Till Date (${today})`;
+    
+    const timeBasedTSheetData: TSheetData = {
+        'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%', avgLatency: '1.2 s', colorTag: 'Green' },
+        'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%', avgLatency: '1.3 s', colorTag: 'Green' },
+        'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%', avgLatency: '1.5 s', colorTag: 'Amber' },
+        'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%', avgLatency: '1.4 s', colorTag: 'Amber' },
+        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%', avgLatency: '1.4 s', colorTag: 'Amber' }
+    };
+    
+    const timeRangesForTSheet = ['Last 1 hour', 'Last 24 h', 'Last 7 days', 'Last 30 days', tillDateHeader];
+
     return {
         metrics: FILE_APP_TIME_BASED_TSHEET_METRICS,
         data: timeBasedTSheetData,
