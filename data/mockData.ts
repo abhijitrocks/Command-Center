@@ -164,7 +164,7 @@ export const getMessageAppKpis = (subscribers: Subscriber[] = [], zones: Zone[] 
     },
     {
         id: 'health_msg',
-        title: 'Health',
+        title: 'Uptime Percentage',
         value: `${(99.91 - (1 - filterFactor) * 0.5).toFixed(2)}%`,
         change: `-${(0.08 * filterFactor).toFixed(2)}%`,
         changeType: 'decrease',
@@ -408,7 +408,7 @@ export const getPerseusDashboardKpis = (subscribers: Subscriber[] = [], zones: Z
     const filterFactor = getFilterFactor(subscribers, zones);
     return [
         {...fileKpis[0], id: 'perseus_mjr_dash', title: 'Perseus Job Runs', value: '4.5M'},
-        {...fileKpis[1], id: 'perseus_health_dash', title: 'Perseus Health', value: '99.99%'},
+        {...fileKpis[1], id: 'perseus_health_dash', title: 'Perseus Uptime Percentage', value: '99.99%'},
         {...fileKpis[2], id: 'perseus_error_dash', title: 'Perseus Error Rate', value: '0.21%'},
         {
             ...fileKpis[3],
@@ -430,7 +430,7 @@ export const getPerseusModuleMetrics = (subscribers: Subscriber[] = [], zones: Z
     return [
     { id: 'perseus_mjr', name: 'Job Runs', value: `${(4.5 * factor * 30).toFixed(1)}M`, status: 'green', description: 'Total number of batch jobs executed by the Perseus module.', change: `+${(8.2 * filterFactor).toFixed(1)}%` },
     { id: 'perseus_records', name: 'Records Processed', value: `${(1.2 * factor * 30).toFixed(1)}B`, status: 'green', description: 'Total number of individual records processed by all jobs in the Perseus module.', change: `+${(10.1 * filterFactor).toFixed(1)}%` },
-    { id: 'perseus_health', name: 'Health', value: '99.99%', status: 'green', description: 'Uptime of the Perseus job processing engine.', change: '+0.00%' },
+    { id: 'perseus_health', name: 'Uptime Percentage', value: '99.99%', status: 'green', description: 'Uptime of the Perseus job processing engine.', change: '+0.00%' },
     { id: 'perseus_error_rate', name: 'Error Rate', value: '0.21%', status: 'green', description: 'Percentage of jobs that failed to complete successfully.', change: '-2.0%' },
 ]};
 
@@ -462,7 +462,7 @@ export const getAtroposDashboardKpis = (subscribers: Subscriber[] = [], zones: Z
     const fileKpis = getFileAppKpis(subscribers, zones, timeRange);
     return [
         {...msgKpis[0], id: 'atropos_events_dash', title: 'Atropos Events Published', value: '25.4M'},
-        {...msgKpis[1], id: 'atropos_health_dash', title: 'Atropos Health', value: '99.91%', status: 'amber'},
+        {...msgKpis[1], id: 'atropos_health_dash', title: 'Atropos Uptime Percentage', value: '99.91%', status: 'amber'},
         {...fileKpis[3], id: 'atropos_css_dash', title: 'Customer Satisfaction', value: '4.8/5', change: '+0.1', changeType: 'increase', status: 'green', description: 'Quarterly customer satisfaction score.'},
     ];
 };
@@ -532,7 +532,7 @@ export const getAlertableMetrics = (): AlertableMetric[] => [
     { id: 'error_rate', name: 'File App: Error Rate', unit: 'percent' },
     { id: 'throughput', name: 'File App: Throughput', unit: 'mbs' },
     { id: 'events_published', name: 'Message App: Events Published', unit: 'count' },
-    { id: 'health_msg', name: 'Message App: Health', unit: 'percent' },
+    { id: 'health_msg', name: 'Message App: Uptime Percentage', unit: 'percent' },
     { id: 'error_rate_msg', name: 'Message App: Error Rate', unit: 'percent' },
     { id: 'p99_latency', name: 'Message App: p99 Latency', unit: 'seconds' },
     { id: 'throughput_msg', name: 'Message App: Throughput', unit: 'k_events_s' },
