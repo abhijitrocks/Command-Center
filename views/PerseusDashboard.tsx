@@ -40,7 +40,9 @@ const MetricCategoryCard: React.FC<{ title: string; metrics: ModuleMetric[] }> =
 );
 
 const OperatorUsageCard: React.FC<{ metrics: OperatorUsageCategory[] }> = ({ metrics }) => {
-    const totalRuns = metrics.flatMap(cat => cat.operators).reduce((sum, op) => sum + op.runs, 0);
+    const allOperators = metrics.flatMap(cat => cat.operators);
+    const totalRuns = allOperators.reduce((sum, op) => sum + op.runs, 0);
+    const maxRuns = allOperators.reduce((max, op) => Math.max(max, op.runs), 0);
 
     return (
         <div className="bg-gray-800 p-6 rounded-lg">
@@ -54,13 +56,18 @@ const OperatorUsageCard: React.FC<{ metrics: OperatorUsageCategory[] }> = ({ met
                                 {category.operators.sort((a, b) => b.runs - a.runs).map(metric => (
                                     <div key={metric.name}>
                                         <div className="flex justify-between items-center text-sm mb-1">
-                                            <span className="text-gray-300 truncate" title={metric.name}>{metric.name}</span>
-                                            <span className="text-white font-medium flex-shrink-0 ml-2">{metric.runs.toLocaleString()}</span>
+                                            <Tooltip content={category.categoryName.replace(' Operator', '')}>
+                                                <span className="text-gray-300 truncate cursor-help" title={metric.name}>{metric.name}</span>
+                                            </Tooltip>
+                                            <div className="flex items-baseline space-x-2 flex-shrink-0 ml-2">
+                                                <span className="text-white font-medium">{metric.runs.toLocaleString()}</span>
+                                                <span className="text-xs text-gray-400">({totalRuns > 0 ? ((metric.runs / totalRuns) * 100).toFixed(2) : '0.00'}%)</span>
+                                            </div>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
                                             <div
                                                 className="bg-brand-purple h-2 rounded-full"
-                                                style={{ width: totalRuns > 0 ? `${(metric.runs / totalRuns) * 100}%` : '0%' }}
+                                                style={{ width: maxRuns > 0 ? `${(metric.runs / maxRuns) * 100}%` : '0%' }}
                                             ></div>
                                         </div>
                                     </div>
