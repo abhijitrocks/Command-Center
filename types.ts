@@ -113,12 +113,24 @@ export interface OperatorUsageCategory {
     operators: OperatorUsageData[];
 }
 
+export interface CostScenario {
+  executionMode: 'BATCH' | 'STREAMING';
+  clusterType: 'ALWAYS_ON' | 'ON_DEMAND';
+  jobCriticality: 'LOW' | 'HIGH';
+  natureOfJob: 'N/A' | 'IO_LOW' | 'IO_MEDIUM' | 'IO_HIGH';
+  estimatedCostPerRecord: number;
+  jobRuns: number;
+  jobRunsPercentage: number;
+  explanation: string;
+}
+
 export interface PerseusCategorizedMetrics {
   health: ModuleMetric[];
   performance: ModuleMetric[];
   business: ModuleMetric[];
   featureUsage: ModuleMetric[];
   operatorUsage: OperatorUsageCategory[];
+  costScenarios: CostScenario[];
 }
 
 export interface MessageAppHeroMetrics {

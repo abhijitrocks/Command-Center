@@ -4,7 +4,7 @@ import TrendChart from '../components/charts/TrendChart';
 import { ArrowLeftIcon, InformationCircleIcon } from '../components/icons';
 import { getPerseusDashboardKpis, getTrendData, getModuleLogs, getPerseusCategorizedMetrics } from '../data/mockData';
 import { useDashboard } from '../contexts/DashboardContext';
-import { ModuleMetric, OperatorUsageCategory } from '../types';
+import { ModuleMetric, OperatorUsageCategory, CostScenario } from '../types';
 import Tooltip from '../components/Tooltip';
 
 interface PerseusDashboardProps {
@@ -83,6 +83,85 @@ const OperatorUsageCard: React.FC<{ metrics: OperatorUsageCategory[] }> = ({ met
     );
 };
 
+const Tag: React.FC<{ text: string; color: 'blue' | 'purple' | 'amber' | 'green' }> = ({ text, color }) => {
+    const colors = {
+        blue: 'bg-blue-500/20 text-blue-300',
+        purple: 'bg-purple-500/20 text-purple-300',
+        amber: 'bg-amber-500/20 text-amber-300',
+        green: 'bg-green-500/20 text-green-300',
+    };
+    return (
+        <span className={`px-2 py-0.5 text-xs font-medium rounded ${colors[color]}`}>
+            {text}
+        </span>
+    );
+};
+
+
+const CostScenariosTable: React.FC<{ scenarios: CostScenario[] }> = ({ scenarios }) => {
+    if (!scenarios || scenarios.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className="bg-gray-800 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold text-white">Cost per Record Breakdown</h3>
+            <p className="text-sm text-gray-400 mt-1 mb-4">
+                The table below outlines the estimated cost per record based on various job configurations and attributes.
+            </p>
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-gray-400 uppercase bg-gray-700/50">
+                        <tr>
+                            <th scope="col" className="px-4 py-3">Execution Mode</th>
+                            <th scope="col" className="px-4 py-3">Cluster Type</th>
+                            <th scope="col" className="px-4 py-3">Job Criticality</th>
+                            <th scope="col" className="px-4 py-3">Nature of Job</th>
+                            <th scope="col" className="px-4 py-3 text-right">Job Runs</th>
+                            <th scope="col" className="px-4 py-3 text-right">Est. Cost / Record</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {scenarios.map((scenario, index) => (
+                            <React.Fragment key={index}>
+                                <tr className="hover:bg-gray-700/30">
+                                    <td className="px-4 py-3">
+                                        <Tag text={scenario.executionMode} color={scenario.executionMode === 'STREAMING' ? 'purple' : 'blue'} />
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-white">
+                                        <Tag text={scenario.clusterType} color={scenario.clusterType === 'ON_DEMAND' ? 'amber' : 'green'} />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Tag text={scenario.jobCriticality} color={scenario.jobCriticality === 'HIGH' ? 'amber' : 'green'} />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <span className="text-gray-300">{scenario.natureOfJob}</span>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="font-semibold text-white">{scenario.jobRuns.toLocaleString()}</div>
+                                        <div className="text-xs text-gray-400">({scenario.jobRunsPercentage.toFixed(2)}%)</div>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <span className="font-mono font-semibold text-white">${scenario.estimatedCostPerRecord.toFixed(6)}</span>
+                                    </td>
+                                </tr>
+                                <tr className="bg-gray-800/50">
+                                    <td colSpan={6} className="px-6 py-2 text-xs text-gray-400 border-b-2 border-gray-900">
+                                        <div className="flex items-start">
+                                            <InformationCircleIcon className="h-4 w-4 inline-block mr-2 flex-shrink-0 text-brand-blue/80" />
+                                            <span>{scenario.explanation}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
 
 const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
     const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
@@ -118,6 +197,10 @@ const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
                 <MetricCategoryCard title="Performance" metrics={categorizedMetrics.performance} />
                 <MetricCategoryCard title="Business" metrics={categorizedMetrics.business} />
             </div>
+
+            {/* Cost Scenarios */}
+            <CostScenariosTable scenarios={categorizedMetrics.costScenarios} />
+
             <div className="grid grid-cols-1 gap-6">
                 <OperatorUsageCard metrics={categorizedMetrics.operatorUsage} />
             </div>

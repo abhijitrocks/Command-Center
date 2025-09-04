@@ -1,4 +1,4 @@
-import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription, Task, OperatorUsageData, OperatorUsageCategory } from '../types';
+import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription, Task, OperatorUsageData, OperatorUsageCategory, CostScenario } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
 const generateSparkline = (length = 12, max = 100) => {
@@ -489,6 +489,31 @@ export const getPerseusCategorizedMetrics = (subscribers: Subscriber[] = [], zon
         }
     ];
 
+    // FIX: Add explicit type to ensure string literals are not inferred as 'string'
+    const scenariosWithRuns: Omit<CostScenario, 'jobRunsPercentage'>[] = [
+        // BATCH Scenarios
+        { executionMode: 'BATCH', clusterType: 'ON_DEMAND', jobCriticality: 'HIGH', natureOfJob: 'IO_HIGH', estimatedCostPerRecord: 0.000300, jobRuns: 50000, explanation: "Highest cost: A dedicated, high-performance cluster is provisioned on-demand for a resource-intensive job. You pay a premium for guaranteed, powerful resources." },
+        { executionMode: 'BATCH', clusterType: 'ON_DEMAND', jobCriticality: 'HIGH', natureOfJob: 'IO_MEDIUM', estimatedCostPerRecord: 0.000250, jobRuns: 120000, explanation: "High cost: A new on-demand cluster is created, optimized for balanced workloads. Cost is lower than IO_HIGH as less specialized hardware is needed." },
+        { executionMode: 'BATCH', clusterType: 'ON_DEMAND', jobCriticality: 'HIGH', natureOfJob: 'IO_LOW', estimatedCostPerRecord: 0.000200, jobRuns: 200000, explanation: "Moderate cost: On-demand cluster ensures reliability, but CPU-optimized (cheaper) instances are used for this non-IO-intensive job." },
+        { executionMode: 'BATCH', clusterType: 'ALWAYS_ON', jobCriticality: 'HIGH', natureOfJob: 'N/A', estimatedCostPerRecord: 0.000150, jobRuns: 1500000, explanation: "Moderate cost: Runs on a shared, pre-warmed cluster, avoiding spin-up costs. High criticality ensures it runs on reliable, on-demand instances within the cluster." },
+        { executionMode: 'BATCH', clusterType: 'ON_DEMAND', jobCriticality: 'LOW', natureOfJob: 'IO_HIGH', estimatedCostPerRecord: 0.000090, jobRuns: 300000, explanation: "Lower cost: While a new cluster is provisioned for an IO-heavy job, using cost-effective Spot instances for a low-criticality job significantly reduces the price." },
+        { executionMode: 'BATCH', clusterType: 'ON_DEMAND', jobCriticality: 'LOW', natureOfJob: 'IO_MEDIUM', estimatedCostPerRecord: 0.000075, jobRuns: 500000, explanation: "Lower cost: A balanced on-demand cluster is created using Spot instances, offering a good blend of performance and cost-savings for non-critical tasks." },
+        { executionMode: 'BATCH', clusterType: 'ON_DEMAND', jobCriticality: 'LOW', natureOfJob: 'IO_LOW', estimatedCostPerRecord: 0.000060, jobRuns: 800000, explanation: "Low cost: The job provisions a new cluster using the cheapest Spot instances, as neither high criticality nor IO performance is required." },
+        { executionMode: 'BATCH', clusterType: 'ALWAYS_ON', jobCriticality: 'LOW', natureOfJob: 'N/A', estimatedCostPerRecord: 0.000030, jobRuns: 2500000, explanation: "Lowest batch cost: The most economical option, running on a shared, always-on cluster using inexpensive Spot instances. Ideal for flexible, non-urgent jobs." },
+        // STREAMING Scenarios
+        { executionMode: 'STREAMING', clusterType: 'ALWAYS_ON', jobCriticality: 'HIGH', natureOfJob: 'N/A', estimatedCostPerRecord: 0.000140, jobRuns: 400000, explanation: "High streaming cost: Streaming requires an always-on cluster, and high criticality uses expensive on-demand instances for maximum reliability and uptime." },
+        { executionMode: 'STREAMING', clusterType: 'ALWAYS_ON', jobCriticality: 'LOW', natureOfJob: 'N/A', estimatedCostPerRecord: 0.000025, jobRuns: 900000, explanation: "Lowest overall cost: Continuous processing on a shared cluster with Spot instances offers the best economy of scale for fault-tolerant streaming jobs." },
+    ];
+    
+    const totalJobRuns = scenariosWithRuns.reduce((sum, s) => sum + s.jobRuns, 0);
+
+    const costScenariosData: CostScenario[] = scenariosWithRuns.map(s => ({
+        ...s,
+        jobRuns: Math.round(s.jobRuns * factor),
+        jobRunsPercentage: totalJobRuns > 0 ? (s.jobRuns / totalJobRuns) * 100 : 0,
+    }));
+
+
     return {
         health: [
             { id: 'perseus_uptime', name: 'Uptime Percentage', value: `${(99.99 - (1-filterFactor) * 0.05).toFixed(4)}%`, status: 'green', description: 'Measures the availability of Perseus by tracking the percentage of time the service is available. Target: 99.99%.' },
@@ -499,10 +524,11 @@ export const getPerseusCategorizedMetrics = (subscribers: Subscriber[] = [], zon
         ],
         business: [
             { id: 'perseus_mcc', name: 'Monthly Cluster Cost (MCC)', value: `$${formatNumber(Math.round(15234 * filterFactor * timeFactor * 30))}`, status: 'neutral', description: 'Total sum of compute, storage & network cost per month for the Perseus module.' },
-            { id: 'perseus_cost_per_record', name: 'Cost per Processed Record', value: `$${(0.00012 / (filterFactor || 0.5)).toFixed(5)}`, status: 'neutral', description: 'The cost associated with processing a single record, helping to measure the platform\'s cost-efficiency.' },
+            { id: 'perseus_cost_per_record', name: 'Average Cost per Record', value: `$${(0.00012 / (filterFactor || 0.5)).toFixed(5)}`, status: 'neutral', description: 'The average cost for processing a single record, across all job types in the selected period.' },
         ],
         featureUsage: [],
         operatorUsage: operatorUsageData,
+        costScenarios: costScenariosData,
     };
 };
 
