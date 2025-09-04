@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { getTaskById } from '../data/mockData';
 import { Task } from '../types';
-// FIX: Add XMarkIcon and DocumentTextIcon to imports.
 import { 
     ChevronLeftIcon, 
     CheckIcon, 

@@ -627,18 +627,22 @@ export const MESSAGE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
 ];
 
 export const getMessageAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
-    const today = new Date().toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
-    const tillDateHeader = `Till Date (${today})`;
+    const tillDateHeader = 'Till Date (9/4)';
     
     const timeBasedTSheetData: TSheetData = {
-        'Last 1 hour':    { topics: '1', msgPublished: '700', subscriptions: '5', msgProcessedBySub: '25K', msgConsumedBySub: '1K', msgApps: '4K', msgProcessedByApp: '1K', msgConsumedByApp: '1K', schedulesCreated: '1', schedulesTriggered: '15' },
-        'Last 24 h':   { topics: '2', msgPublished: '10.0K', subscriptions: '20', msgProcessedBySub: '80K', msgConsumedBySub: '5K', msgApps: '15K', msgProcessedByApp: '10K', msgConsumedByApp: '12K', schedulesCreated: '6', schedulesTriggered: '45' },
-        'Last 7 days':  { topics: '5', msgPublished: '35.0K', subscriptions: '80', msgProcessedBySub: '260K', msgConsumedBySub: '20K', msgApps: '50K', msgProcessedByApp: '40K', msgConsumedByApp: '55K', schedulesCreated: '5', schedulesTriggered: '120' },
-        'Last 30 days': { topics: '8', msgPublished: '40.0K', subscriptions: '120', msgProcessedBySub: '300K', msgConsumedBySub: '25K', msgApps: '60K', msgProcessedByApp: '50K', msgConsumedByApp: '70K', schedulesCreated: '15', schedulesTriggered: '170' },
-        [tillDateHeader]: { topics: '10', msgPublished: '42.5K', subscriptions: '125', msgProcessedBySub: '310K', msgConsumedBySub: '26K', msgApps: '62K', msgProcessedByApp: '52K', msgConsumedByApp: '73K', schedulesCreated: '16', schedulesTriggered: '175' }
+        'Last 1h':    { topics: '1', msgPublished: '700', subscriptions: '5', msgProcessedBySub: '25K', msgConsumedBySub: '1K', msgApps: '4K', msgProcessedByApp: '1K', msgConsumedByApp: '1K', schedulesCreated: '1', schedulesTriggered: '15' },
+        'Last 24h':   { topics: '2', msgPublished: '10.0K', subscriptions: '20', msgProcessedBySub: '80K', msgConsumedBySub: '5K', msgApps: '15K', msgProcessedByApp: '10K', msgConsumedByApp: '12K', schedulesCreated: '6', schedulesTriggered: '45' },
+        'Last 7d':  { topics: '5', msgPublished: '35.0K', subscriptions: '80', msgProcessedBySub: '260K', msgConsumedBySub: '20K', msgApps: '50K', msgProcessedByApp: '40K', msgConsumedByApp: '55K', schedulesCreated: '5', schedulesTriggered: '120' },
+        'Last 30d': { topics: '8', msgPublished: '40.0K', subscriptions: '120', msgProcessedBySub: '300K', msgConsumedBySub: '25K', msgApps: '60K', msgProcessedByApp: '50K', msgConsumedByApp: '70K', schedulesCreated: '15', schedulesTriggered: '170' },
+        [tillDateHeader]: { topics: '10', msgPublished: '42.5K', subscriptions: '125', msgProcessedBySub: '310K', msgConsumedBySub: '26K', msgApps: '62K', msgProcessedByApp: '52K', msgConsumedByApp: '73K', schedulesCreated: '16', schedulesTriggered: '175' },
+        'Aug 2025': { topics: '7', msgPublished: '38.0K', subscriptions: '110', msgProcessedBySub: '280K', msgConsumedBySub: '22K', msgApps: '58K', msgProcessedByApp: '48K', msgConsumedByApp: '68K', schedulesCreated: '14', schedulesTriggered: '160' },
+        'Jul 2025': { topics: '6', msgPublished: '35.0K', subscriptions: '100', msgProcessedBySub: '270K', msgConsumedBySub: '21K', msgApps: '55K', msgProcessedByApp: '45K', msgConsumedByApp: '65K', schedulesCreated: '12', schedulesTriggered: '150' },
+        'Jun 2025': { topics: '5', msgPublished: '30.0K', subscriptions: '90', msgProcessedBySub: '250K', msgConsumedBySub: '18K', msgApps: '50K', msgProcessedByApp: '40K', msgConsumedByApp: '60K', schedulesCreated: '10', schedulesTriggered: '140' },
+        '2025 (YTD)': { topics: '10', msgPublished: '42.5K', subscriptions: '125', msgProcessedBySub: '310K', msgConsumedBySub: '26K', msgApps: '62K', msgProcessedByApp: '52K', msgConsumedByApp: '73K', schedulesCreated: '16', schedulesTriggered: '175' },
+        '2024': { topics: '50', msgPublished: '500K', subscriptions: '600', msgProcessedBySub: '3.5M', msgConsumedBySub: '300K', msgApps: '700K', msgProcessedByApp: '600K', msgConsumedByApp: '850K', schedulesCreated: '80', schedulesTriggered: '2000' },
     };
     
-    const timeRangesForTSheet = ['Last 1 hour', 'Last 24 h', 'Last 7 days', 'Last 30 days', tillDateHeader];
+    const timeRangesForTSheet = ['Last 1h', 'Last 24h', 'Last 7d', 'Last 30d', tillDateHeader, 'Aug 2025', 'Jul 2025', 'Jun 2025', '2025 (YTD)', '2024'];
 
     return {
         metrics: MESSAGE_APP_TIME_BASED_TSHEET_METRICS,
@@ -662,18 +666,22 @@ export const FILE_APP_TIME_BASED_TSHEET_METRICS: TSheetMetric[] = [
 ];
 
 export const getFileAppTimeBasedTSheetData = (selectedSubscribers: Subscriber[] = [], selectedZones: Zone[] = []): { metrics: TSheetMetric[]; data: TSheetData; timeRanges: string[] } => {
-    const today = new Date().toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
-    const tillDateHeader = `Till Date (${today})`;
+    const tillDateHeader = 'Till Date (9/4)';
     
     const timeBasedTSheetData: TSheetData = {
-        'Last 1 hour': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%' },
-        'Last 24 h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%' },
-        'Last 7 days': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%' },
-        'Last 30 days': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '90K', errorRate: '0.96%' },
-        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%' }
+        'Last 1h': { numFileApps: '1', filesProcessed: '1.0K', totalDownloads: '45K', totalUploads: '3K', jobRuns: '6K', errorRate: '0.85%' },
+        'Last 24h': { numFileApps: '3', filesProcessed: '20.0K', totalDownloads: '150K', totalUploads: '9K', jobRuns: '22K', errorRate: '0.95%' },
+        'Last 7d': { numFileApps: '8', filesProcessed: '60.0K', totalDownloads: '509K', totalUploads: '35K', jobRuns: '75K', errorRate: '1.02%' },
+        'Last 30d': { numFileApps: '12', filesProcessed: '90.0K', totalDownloads: '610K', totalUploads: '40K', jobRuns: '↓ 90K', errorRate: '0.96%' },
+        [tillDateHeader]: { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%' },
+        'Aug 2025': { numFileApps: '4', filesProcessed: '30K', totalDownloads: '220K', totalUploads: '14K', jobRuns: '30K', errorRate: '0.93%' },
+        'Jul 2025': { numFileApps: '5', filesProcessed: '32K', totalDownloads: '210K', totalUploads: '13K', jobRuns: '33K', errorRate: '0.97%' },
+        'Jun 2025': { numFileApps: '3', filesProcessed: '28K', totalDownloads: '195K', totalUploads: '12K', jobRuns: '31K', errorRate: '0.92%' },
+        '2025 (YTD)': { numFileApps: '13', filesProcessed: '92.5K', totalDownloads: '625K', totalUploads: '41K', jobRuns: '94K', errorRate: '0.94%' },
+        '2024': { numFileApps: '48', filesProcessed: '370K', totalDownloads: '2.5M', totalUploads: '168K', jobRuns: '385K', errorRate: '1.01%' }
     };
     
-    const timeRangesForTSheet = ['Last 1 hour', 'Last 24 h', 'Last 7 days', 'Last 30 days', tillDateHeader];
+    const timeRangesForTSheet = ['Last 1h', 'Last 24h', 'Last 7d', 'Last 30d', tillDateHeader, 'Aug 2025', 'Jul 2025', 'Jun 2025', '2025 (YTD)', '2024'];
 
     return {
         metrics: FILE_APP_TIME_BASED_TSHEET_METRICS,
@@ -909,6 +917,7 @@ export const getTasks = (): Task[] => {
     ];
 };
 
+// FIX: Corrected the incomplete getTaskById function.
 export const getTaskById = (key: string): Task | undefined => {
     return getTasks().find(task => task.key === key);
 };
