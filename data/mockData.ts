@@ -1,4 +1,4 @@
-import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription, Task } from '../types';
+import { KpiData, TrendData, FailureReason, LogEntry, SubscriberMetric, BatchJobSummary, LatencyData, TraceEntry, ModuleMetric, DrilldownData, TopContributor, Subscriber, Zone, AlertableMetric, AlertRule, AlertCondition, AlertAction, JobRun, TSheetMetric, TSheetData, FeatureAdoption, TimeRange, TriggeredAlert, PerseusCategorizedMetrics, DiaNsmKpi, DiaSupplementaryData, MessageAppHeroMetrics, TopicMetrics, SubscriptionMetrics, RedChartDataPoint, SloMetric, Topic, Subscription, Task, OperatorUsageData, OperatorUsageCategory } from '../types';
 import { SUBSCRIBERS } from '../constants';
 
 const generateSparkline = (length = 12, max = 100) => {
@@ -439,6 +439,56 @@ export const getPerseusCategorizedMetrics = (subscribers: Subscriber[] = [], zon
     const timeFactor = getTimeRangeFactor(timeRange);
     const factor = filterFactor * timeFactor;
 
+    const allOperators: {name: string, category: 'Source' | 'UDF' | 'Sink', runs: number}[] = [
+        // Sources
+        { name: 'Kafka Source Operator', category: 'Source', runs: 12500000 },
+        { name: 'JDBC Source Operator', category: 'Source', runs: 3200000 },
+        { name: 'FileSystem Source Operator', category: 'Source', runs: 2100000 },
+        { name: 'Atropos Source Operator', category: 'Source', runs: 1500000 },
+        { name: 'Dia Source Operator', category: 'Source', runs: 950000 },
+        { name: 'Iceberg Source Operator', category: 'Source', runs: 450000 },
+        
+        // UDFs
+        { name: 'Transform Operator', category: 'UDF', runs: 9800000 },
+        { name: 'Filter Operator', category: 'UDF', runs: 8500000 },
+        { name: 'Group By Operator', category: 'UDF', runs: 3200000 },
+        { name: 'Hades Operator', category: 'UDF', runs: 2800000 },
+        { name: 'HTTP Transform Operator', category: 'UDF', runs: 1900000 },
+        { name: 'Drools Operator', category: 'UDF', runs: 1200000 },
+        { name: 'File Upload Operator', category: 'UDF', runs: 850000 },
+        { name: 'PDF Operator', category: 'UDF', runs: 400000 },
+        { name: 'HadesAsyncTransform Operator', category: 'UDF', runs: 250000 },
+        { name: 'Camel Operator [draft]', category: 'UDF', runs: 50000 },
+
+        // Sinks
+        { name: 'JDBC SINK', category: 'Sink', runs: 7600000 },
+        { name: 'HTTP Sink Operator', category: 'Sink', runs: 4500000 },
+        { name: 'Kafka Sink Operator', category: 'Sink', runs: 4200000 },
+        { name: 'Opensearch Sink', category: 'Sink', runs: 3100000 },
+        { name: 'Atropos Sink Operator', category: 'Sink', runs: 2800000 },
+        { name: 'FileSystem Sink Operator', category: 'Sink', runs: 1800000 },
+        { name: 'Iceberg Sink Operator', category: 'Sink', runs: 1500000 },
+        { name: 'Dia Sink Operator', category: 'Sink', runs: 1100000 },
+        { name: 'Cronus Sink Operator', category: 'Sink', runs: 750000 },
+    ];
+
+    const processedOperators = allOperators.map(op => ({ ...op, runs: Math.round(op.runs * factor) }));
+
+    const operatorUsageData: OperatorUsageCategory[] = [
+        {
+            categoryName: 'Source Operator',
+            operators: processedOperators.filter(op => op.category === 'Source').map(({name, runs}) => ({name, runs}))
+        },
+        {
+            categoryName: 'UDF Operator',
+            operators: processedOperators.filter(op => op.category === 'UDF').map(({name, runs}) => ({name, runs}))
+        },
+        {
+            categoryName: 'Sink Operator',
+            operators: processedOperators.filter(op => op.category === 'Sink').map(({name, runs}) => ({name, runs}))
+        }
+    ];
+
     return {
         health: [
             { id: 'perseus_uptime', name: 'Uptime Percentage', value: `${(99.99 - (1-filterFactor) * 0.05).toFixed(4)}%`, status: 'green', description: 'Measures the availability of Perseus by tracking the percentage of time the service is available. Target: 99.99%.' },
@@ -451,9 +501,8 @@ export const getPerseusCategorizedMetrics = (subscribers: Subscriber[] = [], zon
             { id: 'perseus_mcc', name: 'Monthly Cluster Cost (MCC)', value: `$${formatNumber(Math.round(15234 * filterFactor * timeFactor * 30))}`, status: 'neutral', description: 'Total sum of compute, storage & network cost per month for the Perseus module.' },
             { id: 'perseus_cost_per_record', name: 'Cost per Processed Record', value: `$${(0.00012 / (filterFactor || 0.5)).toFixed(5)}`, status: 'neutral', description: 'The cost associated with processing a single record, helping to measure the platform\'s cost-efficiency.' },
         ],
-        featureUsage: [
-            { id: 'perseus_operator_usage', name: 'Operator Usage', value: `${formatNumber(Math.round(125 * filterFactor))}`, status: 'neutral', description: 'The number of new operator instances integrated with Perseus, indicating its growing adoption within the ecosystem.' },
-        ]
+        featureUsage: [],
+        operatorUsage: operatorUsageData,
     };
 };
 

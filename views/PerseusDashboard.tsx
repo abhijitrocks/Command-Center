@@ -4,7 +4,7 @@ import TrendChart from '../components/charts/TrendChart';
 import { ArrowLeftIcon, InformationCircleIcon } from '../components/icons';
 import { getPerseusDashboardKpis, getTrendData, getModuleLogs, getPerseusCategorizedMetrics } from '../data/mockData';
 import { useDashboard } from '../contexts/DashboardContext';
-import { ModuleMetric } from '../types';
+import { ModuleMetric, OperatorUsageCategory } from '../types';
 import Tooltip from '../components/Tooltip';
 
 interface PerseusDashboardProps {
@@ -39,6 +39,44 @@ const MetricCategoryCard: React.FC<{ title: string; metrics: ModuleMetric[] }> =
     </div>
 );
 
+const OperatorUsageCard: React.FC<{ metrics: OperatorUsageCategory[] }> = ({ metrics }) => {
+    const totalRuns = metrics.flatMap(cat => cat.operators).reduce((sum, op) => sum + op.runs, 0);
+
+    return (
+        <div className="bg-gray-800 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold text-white mb-4">Operator Usage by Job Runs</h3>
+            {metrics.length > 0 && totalRuns > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                    {metrics.map(category => (
+                        <div key={category.categoryName}>
+                            <h4 className="text-md font-semibold text-gray-300 mb-3 pb-2 border-b border-gray-700">{category.categoryName}</h4>
+                            <div className="space-y-3">
+                                {category.operators.sort((a, b) => b.runs - a.runs).map(metric => (
+                                    <div key={metric.name}>
+                                        <div className="flex justify-between items-center text-sm mb-1">
+                                            <span className="text-gray-300 truncate" title={metric.name}>{metric.name}</span>
+                                            <span className="text-white font-medium flex-shrink-0 ml-2">{metric.runs.toLocaleString()}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-700 rounded-full h-2">
+                                            <div
+                                                className="bg-brand-purple h-2 rounded-full"
+                                                style={{ width: totalRuns > 0 ? `${(metric.runs / totalRuns) * 100}%` : '0%' }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                 <p className="text-gray-500 text-center py-8">No operator usage data available.</p>
+            )}
+        </div>
+    );
+};
+
+
 const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
     const { selectedSubscribers, selectedZones, selectedTimeRange } = useDashboard();
     const kpis = getPerseusDashboardKpis(selectedSubscribers, selectedZones, selectedTimeRange);
@@ -68,11 +106,13 @@ const PerseusDashboard: React.FC<PerseusDashboardProps> = ({ onBack }) => {
             </div>
 
             {/* Categorized Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <MetricCategoryCard title="Health" metrics={categorizedMetrics.health} />
                 <MetricCategoryCard title="Performance" metrics={categorizedMetrics.performance} />
                 <MetricCategoryCard title="Business" metrics={categorizedMetrics.business} />
-                <MetricCategoryCard title="Feature Usage" metrics={categorizedMetrics.featureUsage} />
+            </div>
+            <div className="grid grid-cols-1 gap-6">
+                <OperatorUsageCard metrics={categorizedMetrics.operatorUsage} />
             </div>
 
 

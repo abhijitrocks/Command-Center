@@ -103,11 +103,22 @@ export interface ModuleMetric {
   change?: string;
 }
 
+export interface OperatorUsageData {
+    name: string;
+    runs: number;
+}
+
+export interface OperatorUsageCategory {
+    categoryName: string;
+    operators: OperatorUsageData[];
+}
+
 export interface PerseusCategorizedMetrics {
   health: ModuleMetric[];
   performance: ModuleMetric[];
   business: ModuleMetric[];
   featureUsage: ModuleMetric[];
+  operatorUsage: OperatorUsageCategory[];
 }
 
 export interface MessageAppHeroMetrics {
